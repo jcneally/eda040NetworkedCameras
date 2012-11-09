@@ -7,6 +7,8 @@
  * Adapted for Axis cameras by Roger Henriksson 
 */
 
+/* HELP I'M TRAPPED IN A PROGRAMMING FACTORY */
+
 import java.net.*;                  // Provides ServerSocket, Socket
 import java.io.*;                   // Provides InputStream, OutputStream
 
