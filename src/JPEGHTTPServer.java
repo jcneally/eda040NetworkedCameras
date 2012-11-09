@@ -15,6 +15,7 @@ import se.lth.cs.fakecamera.*;      // Provides Axis211A
 /**
  * Itsy bitsy teeny weeny web server. Always returns an image, regardless
  * of the requested file name.
+ * small change...
  */
 public class JPEGHTTPServer {
 
