@@ -7,6 +7,8 @@
  * Adapted for Axis cameras by Roger Henriksson 
 */
 
+/* HELP I'M TRAPPED IN A PROGRAMMING FACTORY */
+
 import java.net.*;                  // Provides ServerSocket, Socket
 import java.io.*;                   // Provides InputStream, OutputStream
 
@@ -15,6 +17,7 @@ import se.lth.cs.fakecamera.*;      // Provides Axis211A
 /**
  * Itsy bitsy teeny weeny web server. Always returns an image, regardless
  * of the requested file name.
+ * small change...
  */
 public class JPEGHTTPServer {
 
