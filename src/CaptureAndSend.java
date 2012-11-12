@@ -20,13 +20,17 @@ public class CaptureAndSend extends Thread{
 	
 	public CaptureAndSend() {
 		// TODO Auto-generated constructor stub
+		camera = new Axis211A()
 	}
 	
+	public void run() {
+		camera.
+	}
 	
 	
 	private boolean detect() {
 		// TODO: Implement this method..
-		motionDetector.detect()
+		motionDetector.detect();
 		return false;
 	}
 }
