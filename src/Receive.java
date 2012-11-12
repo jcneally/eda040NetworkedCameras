@@ -1,7 +1,7 @@
 
 /**
  * 
- * @author Guttmar
+ * @author Viktor Andersson
  *	Receives input stream.
  */
 
