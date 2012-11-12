@@ -1,3 +1,4 @@
+
 import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -21,7 +22,8 @@ class ImagePanel extends JPanel {
         
     public ImagePanel() {
         super();
-        icon = new ImageIcon();
+        //icon = new ImageIcon();
+        icon = new ImageIcon("camera.jpeg");
         JLabel label = new JLabel(icon);
         add(label, BorderLayout.CENTER);
         this.setSize(200, 200);
@@ -30,7 +32,7 @@ class ImagePanel extends JPanel {
     public void refresh(byte[] data) {
         Image theImage = getToolkit().createImage(data);
         getToolkit().prepareImage(theImage,-1,-1,null);     
-        icon.setImage(theImage);
+        //icon.setImage(theImage);
         icon.paintIcon(this, this.getGraphics(), 5, 5);
     }
 }
@@ -44,7 +46,7 @@ class ButtonHandler implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent evt) {
-        gui.refreshImage();
+        //gui.refreshImage();
     }
 }
 
@@ -52,6 +54,10 @@ class GUI extends JFrame {
 
     ImagePanel imagePanel;
     JButton button;
+    JButton connectCamera1;
+    JButton connectCamera2;
+    JButton disconnectCamera1;
+    JButton disconnectCamera2;
     boolean firstCall = true;
     String server;
     int port;
@@ -63,15 +69,25 @@ class GUI extends JFrame {
         this.port = port;
         imagePanel = new ImagePanel();
         button = new JButton("Get image");
+        connectCamera1 = new JButton("Camera 1 Connect");
+        connectCamera2 = new JButton("Camera 2 Connect");
+        disconnectCamera1 = new JButton("Camera 1 Disonnect");
+        disconnectCamera2 = new JButton("Camera 2 Disonnect");
         button.addActionListener(new ButtonHandler(this));
         this.getContentPane().setLayout(new BorderLayout());
         this.getContentPane().add(imagePanel, BorderLayout.NORTH);
         this.getContentPane().add(button, BorderLayout.SOUTH);
+        this.getContentPane().add(connectCamera1, BorderLayout.WEST);
+        this.getContentPane().add(connectCamera2, BorderLayout.EAST);
+        this.getContentPane().add(disconnectCamera1, BorderLayout.SOUTH);
+        this.getContentPane().add(disconnectCamera2, BorderLayout.SOUTH);
         this.setLocationRelativeTo(null);
         this.pack();
-        refreshImage();
+        setVisible(true);
+        imagePanel.refresh(jpeg);
+        //refreshImage();
     }
-
+/*
     public void refreshImage() {
         try {
             // Open a socket to the server, get the input/output streams
@@ -130,14 +146,16 @@ class GUI extends JFrame {
             firstCall = false;
         }
     }
+    
+    */
     // -------------------------------------------------------- PRIVATE METHODS
 
-    private static final byte[] CRLF      = { 13, 10 };
+   // private static final byte[] CRLF      = { 13, 10 };
 
     /**
      * Read a line from InputStream 's', terminated by CRLF. The CRLF is
      * not included in the returned string.
-     */
+     *//*
     private static String getLine(InputStream s) throws IOException {
         boolean done = false;
         String result = "";
@@ -156,14 +174,17 @@ class GUI extends JFrame {
 
         return result;
     }
-
+*/
     /**
      * Send a line on OutputStream 's', terminated by CRLF. The CRLF should not
      * be included in the string str.
      */
+    
+    /*
     private static void putLine(OutputStream s, String str) throws IOException {
         s.write(str.getBytes());
         s.write(CRLF);
     }
+    */
 
 }
