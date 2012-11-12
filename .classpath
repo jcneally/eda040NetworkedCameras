@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/cameraproxy.jar"/>
+	<classpathentry kind="lib" path="lib/fakecamera.jar"/>
+	<classpathentry kind="lib" path="lib/ljrt.jar"/>
+	<classpathentry kind="lib" path="lib/media.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/Carlos/Documents/GitHub/eda040NetworkedCameras/ljrt.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
