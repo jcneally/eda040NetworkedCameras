@@ -1,4 +1,5 @@
-
+import java.net.*;
+import java.io.*;
 import se.lth.cs.fakecamera.Axis211A;
 import se.lth.cs.fakecamera.MotionDetector;
 
@@ -13,25 +14,23 @@ import se.lth.cs.fakecamera.MotionDetector;
  *
  */
 
-
 public class CaptureAndSend extends Thread{
 	private Axis211A camera;
 	private MotionDetector motionDetector;
+	private byte [] jpeg = new byte[Axis211A.IMAGE_BUFFER_SIZE];
+	private ServerSocket serverSocket;
+	private Socket clientSocket;
 	
-	
-	public CaptureAndSend() {
-		// TODO Auto-generated constructor stub
-		camera = new Axis211A()
+	public CaptureAndSend(int port, String host) throws IOException {
+		camera = new Axis211A();
+		camera.connect();
+		serverSocket = new ServerSocket(port);
+		clientSocket = serverSocket.accept();
 	}
 	
 	public void run() {
-		camera.
+		camera.getJPEG(jpeg, 0);
 	}
 	
 	
-	private boolean detect() {
-		// TODO: Implement this method..
-		motionDetector.detect();
-		return false;
-	}
 }

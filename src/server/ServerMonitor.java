@@ -1,8 +1,4 @@
-
-import java.net.*;
-import java.io.*;
-
-import com.sun.imageio.plugins.jpeg.JPEG;	// Is this really the one we should use?
+import se.lth.cs.fakecamera.Axis211A;
 
 /**
  * 
@@ -12,15 +8,21 @@ import com.sun.imageio.plugins.jpeg.JPEG;	// Is this really the one we should us
  */
 
 public class ServerMonitor {
-	JPEG image;
+	byte [] jpeg = new byte[Axis211A.IMAGE_BUFFER_SIZE];
 	
 	public ServerMonitor() {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public synchronized JPEG getImage() {
+	public synchronized byte[] getImage() {
 		// TODO Implement method
 		
-		return null;
+		return jpeg;
+	}
+	
+	public synchronized void setImage(byte[] jpeg) {
+		for(int i = 0; i < Axis211A.IMAGE_BUFFER_SIZE; i++) {
+			this.jpeg[i] = jpeg[i];
+		}
 	}
 }
