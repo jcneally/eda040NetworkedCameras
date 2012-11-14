@@ -34,5 +34,5 @@ public class ImageDispatcher extends Thread{
 	}
 	
 	public void refreshBuffer(Buffer buffer){}
-	//Update the image position in the buffer and removes the images read;
+	//Delete the images not used;
 }

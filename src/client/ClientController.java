@@ -1,8 +1,10 @@
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Socket;
+import java.net.*;
+import java.util.*;
 
 import javax.swing.JButton;
 
@@ -25,12 +27,13 @@ public class ClientController extends Thread {
 		this.Buffer2=Buffer2;
 	}
 	
-	public void OpenSocket(){
+	public void receiveData(){
 		try {
 	        // Open a socket to the server, get the input/output streams
 	        Socket sock = new Socket(server, port);
 	        InputStream is = sock.getInputStream();
 	        OutputStream os = sock.getOutputStream();
+	        DataInputStream istream = new DataInputStream(is);
 	
 	        // Send a simple request, always for "/image.jpg"
 	        putLine(os, "GET /image.jpg HTTP/1.0");
@@ -62,6 +65,7 @@ public class ClientController extends Thread {
 	            if (status > 0) {
 	                bytesRead += status;
 	                bytesLeft -= status;
+	                istream.read();
 	            }
 	        } while (status >= 0);
 	        sock.close();
@@ -76,7 +80,7 @@ public class ClientController extends Thread {
 	    }
 	}
 	
-	public void saveImage(Buffer buffer, int currentBufferIndex){}
+	private void saveImage(Buffer buffer, int currentBufferIndex){}
 	// Save the image from the socket to the buffer;
 
 	
