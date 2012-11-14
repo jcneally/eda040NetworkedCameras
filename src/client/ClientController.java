@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import se.lth.cs.fakecamera.Axis211A;
 import se.lth.cs.realtime.event.Buffer;
 //test
+//test again..
 public class ClientController extends Thread {
 
 	Buffer Buffer1;
