@@ -9,6 +9,7 @@ import se.lth.cs.fakecamera.Axis211A;
 
 public class ServerMonitor {
 	byte [] jpeg = new byte[Axis211A.IMAGE_BUFFER_SIZE];
+	int mode;
 	
 	public ServerMonitor() {
 		
@@ -22,5 +23,13 @@ public class ServerMonitor {
 		for(int i = 0; i < Axis211A.IMAGE_BUFFER_SIZE; i++) {
 			this.jpeg[i] = jpeg[i];
 		}
+	}
+	
+	public synchronized int getMode() {
+		return mode;
+	}
+	
+	public synchronized void setMode(int mode) {
+		this.mode = mode;
 	}
 }

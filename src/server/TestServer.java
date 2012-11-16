@@ -8,11 +8,11 @@ public class TestServer {
 	static int port = 7009;
 	
 	public static void main(String[] args) throws InterruptedException {
-		//ServerMonitor mon = new ServerMonitor();
+		ServerMonitor mon = new ServerMonitor();
 		System.out.println("before start...");
 		
 		//Start captureAndSend (server)
-		CaptureAndSend captureAndSend = new CaptureAndSend(port);
+		CaptureAndSend captureAndSend = new CaptureAndSend(port, mon);
 		captureAndSend.start();
 		System.out.println("Server up and running");
 		
