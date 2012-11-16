@@ -4,12 +4,12 @@ import se.lth.cs.realtime.event.Buffer;
 
 public class ImageDispatcher extends Thread{
 	
-	Buffer Buffer1;
-	Buffer Buffer2;
+	JPEGBuffer bufferCamera1;
+	JPEGBuffer bufferCamera2;
 	
-	public ImageDispatcher(Buffer buffer1, Buffer buffer2){
-		this.Buffer1 = buffer1;
-		this.Buffer2 = buffer2;
+	public ImageDispatcher(JPEGBuffer buffer1, JPEGBuffer buffer2){
+		bufferCamera1 = buffer1;
+		bufferCamera2 = buffer2;
 	}
 	
 	public void getImage(int SynchronizationMode){
