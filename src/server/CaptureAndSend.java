@@ -1,5 +1,6 @@
 import java.net.*;
 import java.io.*;
+
 import se.lth.cs.fakecamera.Axis211A;
 import se.lth.cs.fakecamera.MotionDetector;
 
@@ -23,6 +24,7 @@ public class CaptureAndSend extends Thread{
 	private InputStream is;
 	private OutputStream os;
 	private int port;
+	private int len;
 	
 	/**
 	 * Constructor, connects to the camera and socket. Waits for client to connect.
@@ -38,22 +40,10 @@ public class CaptureAndSend extends Thread{
 	
 	public void run(){
 		while(true){
-			System.out.print("1: ");
-			printByte();
-			System.out.println(camera.getJPEG(jpeg, 0));
-			printByte();
-
-			try {
-				createConnection();
-				capture();
-				sleep(0);
-			} catch (Exception e) {
-				// TODO: handle exception
-				System.out.println("Cached exception..");
-			}
-			System.out.print("2: ");
-			printByte();
-			camera.close();
+			connectCamera();
+			connectClient();
+			capture();
+			send();
 		}
 	}
 	
@@ -67,28 +57,81 @@ public class CaptureAndSend extends Thread{
 		System.out.println();
 	}
 	
-	private void capture() throws IOException {
-		camera.getJPEG(jpeg, 0);		
+	private void capture() {
+		len = camera.getJPEG(jpeg, 0);		
 		System.out.println("-----------");
 		printByte();
 		System.out.println("-----------");
-		os = clientSocket.getOutputStream();
-				
-        int len = camera.getJPEG(jpeg,0);
-        os.write(jpeg,0,len);        
+		
+	}
+	
+	private void send() {
+		// Get outputstream
+		try {
+			os = clientSocket.getOutputStream();
+		} catch (IOException e) {
+			System.out.println("Server: /capture() Failed to get Outputstream");
+			e.printStackTrace();
+		}
+		// write        
+        try {
+			os.write(jpeg,0,len);
+		} catch (IOException e) {
+			System.out.println("Server: /capture() Failed to write");
+			e.printStackTrace();
+		}        
 	}
 	
 	
 	private void createConnection() throws IOException {
 		if(!camera.connect()) {
-			System.out.println("Camera failed to connect!");
+			System.out.println("Server: Camera failed to connect!");
 			System.exit(1);
 		}
-		System.out.println("camera connected!");		
+		System.out.println("Server: camera connected!");		
 		serverSocket = new ServerSocket(port);
-		System.out.println("serverSocket created");
+		System.out.println("Server: serverSocket created");
 		clientSocket = serverSocket.accept();
-		System.out.println("Socket accepted!");	// never prints this.. why?
+		System.out.println("Server: Socket accepted!");	// never prints this.. why?
 		clientSocket.setTcpNoDelay(true);
+	}
+	
+	/**
+	 * Tries to connect to camera. If not possible, exit system.
+	 * TODO: Handle connection problem.
+	 */
+	private void connectCamera() {
+		if(!camera.connect()) {
+			System.out.println("Server: Camera failed to connect!");
+			System.exit(1);
+		}
+	}
+	
+	private void connectClient() {
+		// create ServerSocket
+					try {
+						serverSocket = new ServerSocket(port);
+						System.out.println("Server:serverSocket created");
+					} catch (IOException e) {
+						e.printStackTrace();
+						System.out.println("Server: Failed to create socket with port: " + port);
+					}
+					
+					// wait for accept
+					try {
+						clientSocket = serverSocket.accept();
+						System.out.println("Server: Socket accepted!");	// never prints this.. why?
+					} catch (IOException e) {
+						e.printStackTrace();
+						System.out.println("Server; Failed to accept socket!");
+					}
+					
+					// Set TcpNoDelay
+					try {
+						clientSocket.setTcpNoDelay(true);
+					} catch (SocketException e) {
+						e.printStackTrace();
+						System.out.println("Server: Failed to set TcpNoDelay");
+					}
 	}
 }

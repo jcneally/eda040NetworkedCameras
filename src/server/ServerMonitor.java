@@ -11,12 +11,10 @@ public class ServerMonitor {
 	byte [] jpeg = new byte[Axis211A.IMAGE_BUFFER_SIZE];
 	
 	public ServerMonitor() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	public synchronized byte[] getImage() {
-		// TODO Implement method
-		
 		return jpeg;
 	}
 	
