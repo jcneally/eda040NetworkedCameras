@@ -1,0 +1,34 @@
+<project name="MyProject" default="dist" basedir=".">
+    <description>
+        simple example build file
+    </description>
+  <!-- set global properties for this build -->
+  <property name="src" location="src"/>
+  <property name="bin" location="bin"/>
+
+  <property name="lib"     value="lib"/>
+
+  <path id="classpath">
+      <fileset dir="${lib}" includes="**/*.jar"/>
+  </path>
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <mkdir dir="${bin}" />
+  </target>
+
+  <target name="compile" depends="clean,init"
+        description="compile the source " >
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac srcdir="${src}/client" destdir="${bin}" classpathref="classpath" />
+    <javac srcdir="${src}/server" destdir="${bin}" classpathref="classpath" />
+  </target>
+
+  <target name="clean"
+        description="clean up" >
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <delete dir="${bin}"/>
+    <delete dir="${dist}"/>
+  </target>
+</project>

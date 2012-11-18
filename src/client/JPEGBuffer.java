@@ -1,5 +1,6 @@
 package client;
 
+import se.lth.cs.fakecamera.Axis211A;
 import se.lth.cs.realtime.RTError;
 
 class JPEGBuffer {
@@ -10,7 +11,7 @@ class JPEGBuffer {
 	int nextToPut;		// Writers index.
 	int nextToGet;		// Readers index.
 
-	JPEGBuffer() {
+	public JPEGBuffer() {
 		buffData = new byte[size][jpegsize];
 	}
 

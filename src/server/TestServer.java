@@ -1,7 +1,4 @@
-import java.io.IOException;
-import java.net.Socket;
-import java.net.UnknownHostException;
-
+package server;
 
 public class TestServer {
 	
@@ -10,33 +7,27 @@ public class TestServer {
 	 * @param args
 	 * @throws IOException
 	 */
+	static int port = 7009;
 	
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws InterruptedException {
 		ServerMonitor mon = new ServerMonitor();
 		System.out.println("before start...");
-		clientConnect();
-		CaptureAndSend captureAndSend = new CaptureAndSend(6077);
 		
+		//Start captureAndSend (server)
+		CaptureAndSend captureAndSend = new CaptureAndSend(port, mon);
 		captureAndSend.start();
 		System.out.println("Server up and running");
+		
+		//Start TestConnection (client)
+		TestConnection testConnection = new TestConnection(port);
+		testConnection.start();
+			
+		//Close socket
+		Thread.sleep(3000);
+		testConnection.closeSocket();
+		System.out.println("Client:Socket closed");
+		
 	}
 	
-	private static void clientConnect() {
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		try {
-			Socket socket = new Socket("localhost", 6077);
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+	
 }
