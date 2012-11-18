@@ -1,3 +1,4 @@
+package client;
 
 import java.awt.BorderLayout;
 import java.awt.Image;
@@ -19,13 +20,14 @@ import se.lth.cs.fakecamera.Axis211A;
 
 class ImagePanel extends JPanel {
     ImageIcon icon;
+    JLabel label;
         
     public ImagePanel() {
         super();
         //icon = new ImageIcon();
-        icon = new ImageIcon("camera.jpeg");
-        JLabel label = new JLabel(icon);
-        add(label, BorderLayout.CENTER);
+        icon = new ImageIcon("../../camera.jpeg");
+        label = new JLabel(icon);
+        //add(label, BorderLayout.CENTER);
         this.setSize(200, 200);
     }
         
@@ -51,6 +53,11 @@ class ButtonHandler implements ActionListener {
 }
 
 class GUI extends JFrame {
+
+
+	public static void main(String [] args){
+		new GUI("localhost", 1000);
+	}
 
     ImagePanel imagePanel;
     JButton button;
@@ -81,6 +88,7 @@ class GUI extends JFrame {
         this.getContentPane().add(connectCamera2, BorderLayout.EAST);
         this.getContentPane().add(disconnectCamera1, BorderLayout.SOUTH);
         this.getContentPane().add(disconnectCamera2, BorderLayout.SOUTH);
+        this.getContentPane().add(imagePanel.label, BorderLayout.CENTER);
         this.setLocationRelativeTo(null);
         this.pack();
         setVisible(true);

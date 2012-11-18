@@ -1,3 +1,5 @@
+package server;
+
 import se.lth.cs.fakecamera.Axis211A;
 
 /**

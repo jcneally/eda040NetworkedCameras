@@ -1,3 +1,4 @@
+package client;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -23,7 +24,7 @@ public class ClientController extends Thread {
     JPEGBuffer bufferCamera1;
     JPEGBuffer bufferCamera2;
         
-	public ClientController(String server1, String server2 ,int port1, int port2, JPEGBuffer buffer1, JPEGBUffer buffer2){
+	public ClientController(String server1, String server2 ,int port1, int port2, JPEGBuffer buffer1, JPEGBuffer buffer2){
 	    serverCamera1 = server1;
 	    portCamera1 = port1;
 	    serverCamera2 = server2;
@@ -40,17 +41,26 @@ public class ClientController extends Thread {
 	        OutputStream os = sock.getOutputStream();  
 	      
 	        // Send a simple request, always for "/image.jpg"
-	        putLine(os, "GET /image.jpg HTTP/1.0");
-	        putLine(os, "");        // The request ends with an empty line
+
+	        
+                // VV    Method undefined -James
+
+                //putLine(os, "GET /image.jpg HTTP/1.0");
+	        //putLine(os, "");        // The request ends with an empty line
 	
 	        // Read the first line of the response (status line)
 	        String responseLine;
-	        responseLine = is.read();
-	        System.out.println("HTTP server says '" + responseLine + "'.");
-	        // Ignore the following header lines up to the final empty one.
-	        do {
-	            responseLine = getLine(is);
-	        } while (!(responseLine.equals("")));
+	        
+                // VV   Incompatible Types -James
+                //responseLine = is.read();
+	        //System.out.println("HTTP server says '" + responseLine + "'.");
+	        
+                // Ignore the following header lines up to the final empty one.
+	        //do {
+                    // VV  Method undefined -James
+
+	            //responseLine = getLine(is);
+	        //} while (!(responseLine.equals("")));
 	
 	        // Now load the JPEG image.
 	        int bufferSize = jpeg.length;

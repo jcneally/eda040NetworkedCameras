@@ -1,3 +1,4 @@
+package client;
 
 import se.lth.cs.realtime.event.Buffer;
 
@@ -13,14 +14,14 @@ public class ImageDispatcher extends Thread{
 	}
 	
 	public void getImage(int SynchronizationMode){
-		switch (SynchronizationMode){
+		/*switch (SynchronizationMode){
 		case SYNC:
 			//return the most delayed image and the other with an added delay equal to the difference between both images delays
 			break;
 		case ASYNC:
 			//return the current image
 			break;
-		}
+		}*/
 	}
 	
 	public void skipImages(){
@@ -31,6 +32,7 @@ public class ImageDispatcher extends Thread{
 	public int controlSynchronization(){
 		//If the delay is bigger than a bound, switch to asynchronous and viceversa
 		//Do it with hysteresis to avoid switch continuously
+		return 0;
 	}
 	
 	public void refreshBuffer(Buffer buffer){}
