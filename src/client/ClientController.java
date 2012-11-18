@@ -1,16 +1,9 @@
+package client;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.*;
-import java.util.*;
-
-import javax.swing.JButton;
-
+import java.net.Socket;
 import se.lth.cs.fakecamera.Axis211A;
 
 public class ClientController extends Thread {
@@ -23,7 +16,7 @@ public class ClientController extends Thread {
     JPEGBuffer bufferCamera1;
     JPEGBuffer bufferCamera2;
         
-	public ClientController(String server1, String server2 ,int port1, int port2, JPEGBuffer buffer1, JPEGBUffer buffer2){
+	public ClientController(String server1, String server2 ,int port1, int port2, JPEGBuffer buffer1, JPEGBuffer buffer2){
 	    serverCamera1 = server1;
 	    portCamera1 = port1;
 	    serverCamera2 = server2;
@@ -44,7 +37,7 @@ public class ClientController extends Thread {
 	        putLine(os, "");        // The request ends with an empty line
 	
 	        // Read the first line of the response (status line)
-	        String responseLine;
+	        int responseLine;
 	        responseLine = is.read();
 	        System.out.println("HTTP server says '" + responseLine + "'.");
 	        // Ignore the following header lines up to the final empty one.

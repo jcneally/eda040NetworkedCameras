@@ -12,7 +12,7 @@ public class ImageDispatcher extends Thread{
 		bufferCamera2 = buffer2;
 	}
 	
-	public void getImage(int SynchronizationMode){
+	private void getImage(int SynchronizationMode){
 		switch (SynchronizationMode){
 		case SYNC:
 			//return the most delayed image and the other with an added delay equal to the difference between both images delays
@@ -23,16 +23,18 @@ public class ImageDispatcher extends Thread{
 		}
 	}
 	
-	public void skipImages(){
-		//If the buffer allocate too many images, jump to the one according to the current time, and skip the old ones.
+	private void skipImages(){
+		//If the buffer allocate too many images, jump to the image according to the current time, and skip the old ones.
 		//Test it with the delay of the last image
 	}
 	
-	public int controlSynchronization(){
+	private int controlSynchronization(){
 		//If the delay is bigger than a bound, switch to asynchronous and viceversa
 		//Do it with hysteresis to avoid switch continuously
 	}
 	
-	public void refreshBuffer(Buffer buffer){}
+	private void refreshBuffer(Buffer buffer){}
 	//Delete the images not used;
+	
+	public void run(){}
 }
