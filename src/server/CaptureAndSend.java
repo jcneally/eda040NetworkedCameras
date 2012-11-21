@@ -1,5 +1,6 @@
 package server;
 
+
 import java.net.*;
 import java.io.*;
 
@@ -135,29 +136,29 @@ public class CaptureAndSend extends Thread{
 	 */
 	private void connectClient() {
 		// create ServerSocket
-					try {
-						serverSocket = new ServerSocket(port);
-						System.out.println("Server:serverSocket created");
-					} catch (IOException e) {
-						e.printStackTrace();
-						System.out.println("Server: Failed to create socket with port: " + port);
-					}
-					
-					// wait for accept
-					try {
-						clientSocket = serverSocket.accept();
-						System.out.println("Server: Socket accepted!");	// never prints this.. why?
-					} catch (IOException e) {
-						e.printStackTrace();
-						System.out.println("Server; Failed to accept socket!");
-					}
-					
-					// Set TcpNoDelay
-					try {
-						clientSocket.setTcpNoDelay(true);
-					} catch (SocketException e) {
-						e.printStackTrace();
-						System.out.println("Server: Failed to set TcpNoDelay");
-					}
+		try {
+			serverSocket = new ServerSocket(port);
+			System.out.println("Server:serverSocket created");
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Server: Failed to create socket with port: " + port);
+		}
+
+		// wait for accept
+		try {
+			clientSocket = serverSocket.accept();
+			System.out.println("Server: Socket accepted!");	// never prints this.. why?
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Server; Failed to accept socket!");
+		}
+
+		// Set TcpNoDelay
+		try {
+			clientSocket.setTcpNoDelay(true);
+		} catch (SocketException e) {
+			e.printStackTrace();
+			System.out.println("Server: Failed to set TcpNoDelay");
+		}
 	}
 }
