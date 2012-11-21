@@ -4,6 +4,13 @@ import se.lth.cs.fakecamera.Axis211A;
 import se.lth.cs.realtime.RTError;
 
 class JPEGBuffer {
+	
+	///////////////////////////////////////////////////////////////////////////////////
+	//	This is a monitor which implements a synchronized image buffer to ensure     //
+	//	concurrency and provide safe and full images to the other threads. It has    //
+	//	also a method to skip images in case are not relevant (due to a high delay)  //
+	///////////////////////////////////////////////////////////////////////////////////
+	
 	int available;		// Number of lines that are available. 
 	final int size=10;		// The max number of buffered lines.
 	final int jpegsize = Axis211A.IMAGE_BUFFER_SIZE;
@@ -39,5 +46,13 @@ class JPEGBuffer {
 		available--;
 		notifyAll();
 		return ans;
+	}
+	
+	synchronized void skipJPEG(){
+		//Erase unused images due to its high delay and jumps to the next read position
+		buffData[nextToGet] = null;
+		if(++nextToGet >= size) nextToGet = 0;
+		available--;
+		notifyAll();
 	}
 }
