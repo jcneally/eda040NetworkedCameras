@@ -16,30 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.*;
-
-import se.lth.cs.fakecamera.Axis211A;
-
-
-class ImagePanel extends JPanel {
-    ImageIcon icon;
-    JLabel label;
-        
-    public ImagePanel() {
-        super();
-        //icon = new ImageIcon();
-        icon = new ImageIcon("../camera.jpeg");
-        label = new JLabel(icon);
-        //add(label, BorderLayout.CENTER);
-        //this.setSize(300, 300);
-    }
-        
-    public void refresh(byte[] data) {
-        Image theImage = getToolkit().createImage(data);
-        getToolkit().prepareImage(theImage,-1,-1,null);     
-        //icon.setImage(theImage);
-        icon.paintIcon(this, this.getGraphics(), 5, 5);
-    }
-}
+import java.awt.image.*;
 
 class ConnectionButtonHandler implements ActionListener {
 
@@ -52,6 +29,7 @@ class ConnectionButtonHandler implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent evt) {
+    	gui.pack();
         gui.toggleConnection(camera);
     }
 }
@@ -93,8 +71,8 @@ class GUI extends JFrame {
 		new GUI();
 	}
 
-    ImagePanel camera1;
-    ImagePanel camera2;
+    JLabel camera1;
+    JLabel camera2;
     JButton button;
     JButton connectCamera1;
     JButton connectCamera2;
@@ -113,8 +91,12 @@ class GUI extends JFrame {
 
     public GUI() {
         super();
-        camera1 = new ImagePanel();
-        camera2 = new ImagePanel();
+        
+        ImageIcon icon = new ImageIcon("../camera.jpeg");
+        
+    	camera1 = new JLabel(icon);
+    	camera2 = new JLabel(icon);
+        
         connectCamera1 = new JButton("Camera 1 Connect");
         connectCamera2 = new JButton("Camera 2 Connect");
         disconnectCamera1 = new JButton("Camera 1 Disconnect");
@@ -135,6 +117,7 @@ class GUI extends JFrame {
         
         sync = new JRadioButton("Synchronus");
         async = new JRadioButton("Asynchronus");
+        
         
         connectCamera1.addActionListener(new ConnectionButtonHandler(this, 1));
         disconnectCamera1.addActionListener(new ConnectionButtonHandler(this, 1));
@@ -165,27 +148,22 @@ class GUI extends JFrame {
 		
 		c.gridx = 0;
 		c.gridy = 0;
-		
 		left.add(connectCamera1, c);
 		right.add(connectCamera2, c);
 		
 		c.gridy = 1;
-		
 		left.add(disconnectCamera1, c);
 		right.add(disconnectCamera2, c);
 		
 		c.gridy = 2;
-		
 		left.add(delay1, c);
 		right.add(delay2, c);
 		
 		c.gridy = 3;
-		
 		left.add(fps1, c);
 		right.add(fps2, c);
 		
 		c.gridy = 4;
-		
 		left.add(movement1, c);
 		right.add(movement2, c);
 		
@@ -195,17 +173,14 @@ class GUI extends JFrame {
 		
 		c.gridx = 0;
 		c.gridy = 0;
-		
 		bottom_left.add(movie, c);
 		bottom_right.add(sync, c);
 		
 		c.gridy = 1;
-		
 		bottom_left.add(idle, c);
 		bottom_right.add(async, c);
 		
 		c.gridy = 2;
-		
 		bottom_left.add(auto, c);
 		
 		
@@ -219,72 +194,28 @@ class GUI extends JFrame {
 		c.gridy = 0;
         pane.add(left, c);
         
-        //c.fill = GridBagConstraints.HORIZONTAL;
         c.gridwidth = 1;
 		c.gridx = 1;
 		c.gridy = 0;
-        pane.add(camera1.label, c);
+        pane.add(camera1, c);
         
-        //c.fill = GridBagConstraints.HORIZONTAL;
-        //c.insets = new Insets(0,100,0,0);
 		c.gridx = 2;
 		c.gridy = 0;
-        pane.add(camera2.label, c);
+        pane.add(camera2, c);
         
         c.gridx = 3;
         c.gridy = 0;
         pane.add(right, c);
         
-        // reset insets
-        c.insets = new Insets(0,0,0,0);
         c.gridwidth = 1;
-        
         c.gridx = 1;
         c.gridy = 1;
-        
         pane.add(bottom_left, c);
         
         c.gridx = 2;
         
         pane.add(bottom_right, c);
-        // Camera 1 Connect
-        /*c.fill = GridBagConstraints.NONE;
-		c.gridx = 0;
-		c.gridy = 1;
-		c.weightx = 0;
-		c.weighty = 0;
-		c.gridwidth = 1;
-        pane.add(connectCamera1, c);
         
-        // Camera 1 Disconnect
-        c.fill = GridBagConstraints.NONE;
-		c.gridx = 1;
-		c.gridy = 1;
-		c.gridwidth = 1;
-        pane.add(disconnectCamera1, c);*/
-        
-        // Camera 2 Connect
-        /*
-        c.fill = GridBagConstraints.NONE;
-		c.gridx = 2;
-		c.gridy = 1;
-		c.gridwidth = 1;
-        pane.add(connectCamera2, c);
-        
-        // Camera 2 Disconnect
-        c.fill = GridBagConstraints.NONE;
-		c.gridx = 4;
-		c.gridy = 1;
-		c.gridwidth = 1;
-        pane.add(disconnectCamera2, c);*/
-        
-        //this.getContentPane().add(imagePanel, BorderLayout.NORTH);
-        /*this.getContentPane().add(button, BorderLayout.SOUTH);
-        this.getContentPane().add(connectCamera1, BorderLayout.WEST);
-        this.getContentPane().add(connectCamera2, BorderLayout.EAST);
-        this.getContentPane().add(disconnectCamera1, BorderLayout.SOUTH);
-        this.getContentPane().add(disconnectCamera2, BorderLayout.SOUTH);
-        this.getContentPane().add(imagePanel.label, BorderLayout.CENTER);*/
         this.setLocationRelativeTo(null);
         this.pack();
         setVisible(true);
@@ -361,4 +292,18 @@ class GUI extends JFrame {
 		 		break;
 		 }
 	}
+	
+	
+	public void updateCamera1(byte[] data) {
+        Image theImage = getToolkit().createImage(data);
+        getToolkit().prepareImage(theImage,-1,-1,null);     
+        camera1.setIcon(new ImageIcon(theImage));
+    }
+    
+    public void updateCamera2(byte[] data) {
+        Image theImage = getToolkit().createImage(data);
+        getToolkit().prepareImage(theImage,-1,-1,null);     
+        camera2.setIcon(new ImageIcon(theImage));
+    }
+	
 }
