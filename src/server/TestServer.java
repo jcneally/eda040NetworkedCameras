@@ -25,7 +25,7 @@ public class TestServer {
 		testConnection.start();
 			
 		//Close socket
-		Thread.sleep(3000);
+		Thread.sleep(10000);
 		testConnection.closeSocket();
 		System.out.println("Client:Socket closed");
 		
