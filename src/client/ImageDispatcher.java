@@ -98,8 +98,8 @@ public class ImageDispatcher extends Thread{
 	}
 	
 	public void run(){
-		delayCamera1 = getDelay(CAMERA1);
-		delayCamera2 = getDelay(CAMERA2);
+		//delayCamera1 = getDelay(CAMERA1);
+		//delayCamera2 = getDelay(CAMERA2);
 		refreshImage(ASYNC);
 	}
 }
