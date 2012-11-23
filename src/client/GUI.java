@@ -87,8 +87,6 @@ class GUI extends JFrame {
     boolean camera1connected = false;
     boolean camera2connected = false;
     
-    byte [] jpeg = new byte[Axis211A.IMAGE_BUFFER_SIZE];
-
     public GUI() {
         super();
         
