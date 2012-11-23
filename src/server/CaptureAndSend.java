@@ -2,7 +2,6 @@ package server;
 
 import java.net.*;
 import java.io.*;
-
 import se.lth.cs.fakecamera.Axis211A;
 import se.lth.cs.fakecamera.MotionDetector;
 
@@ -29,9 +28,7 @@ public class CaptureAndSend extends Thread{
 	private int port;
 	private int mode;												// 0 for IDLE_MODE and 1 for MOVIE_MODE.
 	private long idleSleepTime;										// Time to sleep when in idle mode.
-	
-	final static int IDLE_MODE = 0;
-	final static int MOVIE_MODE = 1;
+
 	
 	/**
 	 * Constructor, creates a fake camera and gets port nbr.
@@ -42,24 +39,32 @@ public class CaptureAndSend extends Thread{
 		this.port = port;
 		idleSleepTime = 5000;	// 5 sec.
 		this.monitor = monitor;
+		motionDetector = new MotionDetector();
 	}
-	
-	
+
+	/**
+	 * Run method. Connects to camera and client, 
+	 * then while connected, captures images, 
+	 * detects motion and send to client.
+	 */
 	public void run(){
-		
 		long t = System.currentTimeMillis();
 		long diff;
-		
+
 		while(true){
-			
-			connectCamera();
-			connectClient();
+
+		connectCamera();
+		connectClient();
+		
+		while(clientSocket.isConnected()) {
 			capture();
-			send();
+			//detect();
+			System.out.println("Server: motion = " + motionDetector.getLevel());
+			send();				
 			
 			// Handle mode and sleep appropriately 
-			mode = monitor.getMode();
-			if(mode == IDLE_MODE) {
+			switch (monitor.getMode()) {
+			case ServerMonitor.IDLE_MODE:
 				t += idleSleepTime;
 				diff = t - System.currentTimeMillis();
 				if(diff > 0) {
@@ -69,16 +74,24 @@ public class CaptureAndSend extends Thread{
 						e.printStackTrace();						
 					}
 				}
-			} else if(mode == MOVIE_MODE) {
+				break;
+			case ServerMonitor.MOVIE_MODE:
 				t = System.currentTimeMillis();		// Is this inefficient?
-			} else {
+				break;
+			case ServerMonitor.AUTO_MODE:
+				// TODO: Handle AUTO_MODE...
+				break;
+
+			default:
 				System.out.println("int does not correspond to a mode!");
 				System.exit(1);
+				break;
 			}
-			
+			// end of sleep handling
+		}
 		}
 	}
-	
+
 	/**
 	 * For testing...
 	 */
@@ -88,17 +101,17 @@ public class CaptureAndSend extends Thread{
 		}
 		System.out.println();
 	}
-	
+
 	/**
 	 * Get jpeg from camera. Prints first bytes for test.
 	 */
 	private void capture() {
 		len = camera.getJPEG(jpeg, 0);		
-		System.out.println("-----------");
-		printByte();
-		System.out.println("-----------");		
+//		System.out.println("-----------");
+//		printByte();
+//		System.out.println("-----------");		
 	}
-	
+
 	/**
 	 * Gets outputstream and then writes the jpeg byte array to it.
 	 */
@@ -111,7 +124,7 @@ public class CaptureAndSend extends Thread{
 			e.printStackTrace();
 		}
 		// write        
-        try {
+		try {
 			os.write(jpeg,0,len);
 		} catch (IOException e) {
 			System.out.println("Server: /capture() Failed to write");
@@ -129,35 +142,36 @@ public class CaptureAndSend extends Thread{
 			System.exit(1);
 		}
 	}
-	
+
 	/**
 	 * Creates ServerSocket and waits for client to connect. Also sets TcpNoDelay to true.
 	 */
 	private void connectClient() {
 		// create ServerSocket
-					try {
-						serverSocket = new ServerSocket(port);
-						System.out.println("Server:serverSocket created");
-					} catch (IOException e) {
-						e.printStackTrace();
-						System.out.println("Server: Failed to create socket with port: " + port);
-					}
-					
-					// wait for accept
-					try {
-						clientSocket = serverSocket.accept();
-						System.out.println("Server: Socket accepted!");	// never prints this.. why?
-					} catch (IOException e) {
-						e.printStackTrace();
-						System.out.println("Server; Failed to accept socket!");
-					}
-					
-					// Set TcpNoDelay
-					try {
-						clientSocket.setTcpNoDelay(true);
-					} catch (SocketException e) {
-						e.printStackTrace();
-						System.out.println("Server: Failed to set TcpNoDelay");
-					}
+		try {
+			serverSocket = new ServerSocket(port);
+			System.out.println("Server:serverSocket created");
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Server: Failed to create socket with port: " + port);
+		}
+
+		// wait for accept
+		try {
+			clientSocket = serverSocket.accept();
+			System.out.println("Server: Socket accepted!");	// never prints this.. why?
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Server; Failed to accept socket!");
+		}
+
+		// Set TcpNoDelay
+		try {
+			clientSocket.setTcpNoDelay(true);
+		} catch (SocketException e) {
+			e.printStackTrace();
+			System.out.println("Server: Failed to set TcpNoDelay");
+		}
 	}
+	
 }
