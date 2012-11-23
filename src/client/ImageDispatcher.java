@@ -20,7 +20,7 @@ public class ImageDispatcher extends Thread{
 	
 	private final int delayUpBound = 20; //Change this delay bound to switch to async, when test the program
 	private final int delayLowBound = 10; //Change this delay bound to switch to sync, when test the program
-	private final int delayMargin = 10; //Change this delay margin to adjust the acceptable difference delay while synchronized
+	private final int delayMargin = 5; //Change this delay margin to adjust the acceptable difference delay while synchronized
 	private final int SYNC = 1;
 	private final int ASYNC  = 2;
 	private final int AUTO = 0;
@@ -47,7 +47,7 @@ public class ImageDispatcher extends Thread{
 
 		case SYNC:
 			//return the most delayed image and the other with an added delay equal to the difference between both images delays
-			skipImages();
+			syncImages();
 			gui.refresh(bufferCamera1.getJPEG(),CAMERA1);
 			gui.refresh(bufferCamera2.getJPEG(),CAMERA2);		
 			break;
@@ -60,18 +60,18 @@ public class ImageDispatcher extends Thread{
 		}
 	}
 	
-	private void skipImages(){
+	private void syncImages(){
 		//If the buffer allocate too many images, jump to the image according to the current time, and skip the old ones.
 		//Test it with the delay of the last image
 		if(delayCamera1>delayCamera2){
 			while(delayCamera1<(delayCamera2+delayMargin)){
-				bufferCamera2.skipJPEG();
-				delayCamera2 = getDelay(CAMERA2);
-			}
-		}else{
-			while((delayCamera1+delayMargin)>delayCamera2){
 				bufferCamera1.skipJPEG();
 				delayCamera1 = getDelay(CAMERA1);
+			}
+		}else if(delayCamera1<delayCamera2){
+			while((delayCamera1+delayMargin)>delayCamera2){
+				bufferCamera2.skipJPEG();
+				delayCamera2 = getDelay(CAMERA2);
 			}
 		}
 	}

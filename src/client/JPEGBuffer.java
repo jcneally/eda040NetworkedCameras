@@ -50,6 +50,11 @@ class JPEGBuffer {
 	
 	synchronized void skipJPEG(){
 		//Erase unused images due to its high delay and jumps to the next read position
+		try {
+			while(available == 0) wait();
+		} catch (InterruptedException e) {
+			throw new RTError("Buffer.skipJPEG interrupted:" + e);
+		}
 		buffData[nextToGet] = null;
 		if(++nextToGet >= size) nextToGet = 0;
 		available--;
