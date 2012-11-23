@@ -18,9 +18,9 @@ public class ImageDispatcher extends Thread{
 	private int delayCamera1;
 	private int delayCamera2;
 	
-	private final int delayUpBound = 20; //Change this delay bound to switch to async, when test the program
-	private final int delayLowBound = 10; //Change this delay bound to switch to sync, when test the program
-	private final int delayMargin = 5; //Change this delay margin to adjust the acceptable difference delay while synchronized
+	private final int delayUpBound = 200; //Change this delay bound to switch to async, when test the program
+	private final int delayLowBound = 100; //Change this delay bound to switch to sync, when test the program
+	private final int delayMargin = 100; //Change this delay margin to adjust the acceptable difference delay while synchronized
 	private final int SYNC = 1;
 	private final int ASYNC  = 2;
 	private final int AUTO = 0;
@@ -39,23 +39,25 @@ public class ImageDispatcher extends Thread{
 		
 		if(SynchronizationMode==AUTO){
 			mode = controlSynchronization(mode);
+			//gui.setMode(mode);
 		}else{
 			mode = SynchronizationMode;
 		}
+	
 		
 		switch (mode){
 
 		case SYNC:
 			//return the most delayed image and the other with an added delay equal to the difference between both images delays
 			syncImages();
-			gui.refresh(bufferCamera1.getJPEG(),CAMERA1);
-			gui.refresh(bufferCamera2.getJPEG(),CAMERA2);		
+			gui.updateCamera1(bufferCamera1.getJPEG());
+			gui.updateCamera2(bufferCamera2.getJPEG());		
 			break;
 		
 		case ASYNC:
 			//return the current image
-			gui.refresh(bufferCamera1.getJPEG(),CAMERA1);
-			gui.refresh(bufferCamera2.getJPEG(),CAMERA2);			
+			gui.updateCamera1(bufferCamera1.getJPEG());
+			gui.updateCamera2(bufferCamera2.getJPEG());			
 			break;
 		}
 	}
@@ -98,6 +100,6 @@ public class ImageDispatcher extends Thread{
 	public void run(){
 		delayCamera1 = getDelay(CAMERA1);
 		delayCamera2 = getDelay(CAMERA2);
-		refreshImage(gui.mode());
+		refreshImage(ASYNC);
 	}
 }

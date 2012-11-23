@@ -23,12 +23,16 @@ public class JPEGHTTPClient {
         JPEGBuffer buffer2 = new JPEGBuffer();
         
         String server1 = "localhost", server2 = "localhost";
-	int port1 = 6077, port2 = 6077;
+        int port1 = 6077, port2 = 6077;
 
-        ClientController clientController = new ClientController(server1,server2,port1,port2,buffer1,buffer2); 
-
-	clientController.start();
-        new GUI();
+        GUI gui = new GUI();
+        
+        ClientDataController clientDataController = new ClientDataController(server1,server2,port1,port2,buffer1,buffer2); 
+        ImageDispatcher imageDispatcher = new ImageDispatcher(buffer1, buffer2, gui);
+        
+        clientDataController.start();
+        imageDispatcher.start();
+        
     }
 
 }
