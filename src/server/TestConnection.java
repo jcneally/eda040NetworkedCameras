@@ -53,7 +53,7 @@ public class TestConnection extends Thread{
 
 			} catch (IOException e) {
 				System.out.println("Client: Failed to read bytes");
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 

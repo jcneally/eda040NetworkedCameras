@@ -19,13 +19,15 @@ public class TestServer {
 		CaptureAndSend captureAndSend = new CaptureAndSend(port, mon);
 		captureAndSend.start();
 		System.out.println("Server up and running");
+		Receive receive = new Receive();
+		receive.start();
 		
 		//Start TestConnection (client)
 		TestConnection testConnection = new TestConnection(port);
 		testConnection.start();
 			
 		//Close socket
-		Thread.sleep(10000);
+		Thread.sleep(30000);
 		testConnection.closeSocket();
 		System.out.println("Client:Socket closed");
 		

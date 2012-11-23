@@ -27,8 +27,8 @@ public class CaptureAndSend extends Thread{
 	private OutputStream os;
 	private int port;
 	private int mode;												// 0 for IDLE_MODE and 1 for MOVIE_MODE.
-	private long idleSleepTime;										// Time to sleep when in idle mode.
-
+	private int idleSleepTime;										// Time to sleep when in idle mode is idleSleepTime * detectSleepTime.
+	private long detectSleepTime;
 	
 	/**
 	 * Constructor, creates a fake camera and gets port nbr.
@@ -37,7 +37,9 @@ public class CaptureAndSend extends Thread{
 	public CaptureAndSend(int port, ServerMonitor monitor) {
 		camera = new Axis211A();
 		this.port = port;
-		idleSleepTime = 5000;	// 5 sec.
+		detectSleepTime = 1000; // 1 sec.
+		idleSleepTime = 5;		// 5 detectSleepTimes.
+		
 		this.monitor = monitor;
 		motionDetector = new MotionDetector();
 	}
@@ -57,29 +59,60 @@ public class CaptureAndSend extends Thread{
 		connectClient();
 		
 		while(clientSocket.isConnected()) {
-			capture();
-			//detect();
-			System.out.println("Server: motion = " + motionDetector.getLevel());
+			capture();			
 			send();				
 			
-			// Handle mode and sleep appropriately 
+			// Handle mode. Sleep and detect appropriately. 
 			switch (monitor.getMode()) {
 			case ServerMonitor.IDLE_MODE:
-				t += idleSleepTime;
-				diff = t - System.currentTimeMillis();
-				if(diff > 0) {
-					try {
-						sleep(diff);
-					} catch (InterruptedException e) {
-						e.printStackTrace();						
+
+				for( int i = 0; i < idleSleepTime; i++) {
+					System.out.println("Server: motion = " + motionDetector.getLevel());
+					if(motionDetector.detect()) {
+						System.out.println("Server: Motion detected!");
+						// TODO: handle motion i.e. send message to client.
+					}
+					t += detectSleepTime;
+					diff = t - System.currentTimeMillis();
+					if(diff > 0) {
+						try {
+							sleep(diff);
+						} catch (InterruptedException e) {
+							e.printStackTrace();						
+						}
 					}
 				}
+
 				break;
 			case ServerMonitor.MOVIE_MODE:
-				t = System.currentTimeMillis();		// Is this inefficient?
+				System.out.println("Server: motion = " + motionDetector.getLevel());
+				if(motionDetector.detect()) {	// TODO: possibly add something so that detect does not run every time.
+					System.out.println("Server: Motion detected!");
+					// TODO: handle motion i.e. send message to client.
+				}
+				t = System.currentTimeMillis();
 				break;
 			case ServerMonitor.AUTO_MODE:
 				// TODO: Handle AUTO_MODE...
+				for( int i = 0; i < idleSleepTime; i++) {
+					System.out.println("Server: motion = " + motionDetector.getLevel());
+					if(motionDetector.detect()) {
+						System.out.println("Server: Motion detected!");
+						// TODO: handle motion i.e. send message to client.
+						monitor.setMode(ServerMonitor.MOVIE_MODE);
+					}
+					t += detectSleepTime;
+					diff = t - System.currentTimeMillis();
+					if(diff > 0) {
+						try {
+							sleep(diff);
+						} catch (InterruptedException e) {
+							e.printStackTrace();						
+						}
+					}
+				}
+
+				
 				break;
 
 			default:
@@ -87,7 +120,7 @@ public class CaptureAndSend extends Thread{
 				System.exit(1);
 				break;
 			}
-			// end of sleep handling
+			// end of sleep/detect handling
 		}
 		}
 	}
@@ -159,7 +192,9 @@ public class CaptureAndSend extends Thread{
 		// wait for accept
 		try {
 			clientSocket = serverSocket.accept();
-			System.out.println("Server: Socket accepted!");	// never prints this.. why?
+			System.out.println("Server: Socket accepted!");
+			
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("Server; Failed to accept socket!");
