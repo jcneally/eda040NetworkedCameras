@@ -1,7 +1,5 @@
 package server;
 
-
-
 public class TestServer {
 	
 	/**
@@ -19,7 +17,7 @@ public class TestServer {
 		CaptureAndSend captureAndSend = new CaptureAndSend(port, mon);
 		captureAndSend.start();
 		System.out.println("Server up and running");
-		Receive receive = new Receive();
+		Receive receive = new Receive(mon);
 		receive.start();
 		
 		//Start TestConnection (client)

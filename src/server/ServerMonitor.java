@@ -1,6 +1,7 @@
 package server;
 
 import se.lth.cs.fakecamera.Axis211A;
+import java.net.*;
 
 /**
  * 
@@ -12,6 +13,7 @@ import se.lth.cs.fakecamera.Axis211A;
 public class ServerMonitor {
 	byte [] jpeg = new byte[Axis211A.IMAGE_BUFFER_SIZE];
 	int mode;
+	Socket clientSocket = null;
 	
 	final static int IDLE_MODE = 0;
 	final static int MOVIE_MODE = 1;
@@ -37,5 +39,14 @@ public class ServerMonitor {
 	
 	public synchronized void setMode(int mode) {
 		this.mode = mode;
+	}
+	
+	public synchronized Socket getClientSocket() {
+		return clientSocket;
+	}
+	
+	public synchronized void setClientSocket(Socket clientSocket) {
+		this.clientSocket = clientSocket;
+		notifyAll();
 	}
 }

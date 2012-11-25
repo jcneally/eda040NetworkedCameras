@@ -193,8 +193,9 @@ public class CaptureAndSend extends Thread{
 		try {
 			clientSocket = serverSocket.accept();
 			System.out.println("Server: Socket accepted!");
-			
-			
+
+			// Set the clientSocket to monitor (and notify in monitor) so that receive thread can access it.
+			monitor.setClientSocket(clientSocket);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("Server; Failed to accept socket!");
