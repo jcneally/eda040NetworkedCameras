@@ -1,23 +1,19 @@
 package client;
 
-import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
 
 import javax.swing.*;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.image.*;
 
+/**
+	ConnectionButtonHandler
+	
+	An ActionListener added to the connection buttons to connect the cameras.
+
+*/
 class ConnectionButtonHandler implements ActionListener {
 
     GUI gui;
@@ -34,6 +30,12 @@ class ConnectionButtonHandler implements ActionListener {
     }
 }
 
+/**
+	MovementButtonHandler
+	
+	An ActionListener added to the movement radio buttons to select one.
+
+*/
 class MovementButtonHandler implements ActionListener {
 
     GUI gui;
@@ -49,6 +51,12 @@ class MovementButtonHandler implements ActionListener {
     }
 }
 
+/**
+	SynchronizeButtonHandler
+	
+	An ActionListener added to the synchronize radio buttons to select one.
+
+*/
 class SynchronizeButtonHandler implements ActionListener {
 
     GUI gui;
@@ -64,34 +72,41 @@ class SynchronizeButtonHandler implements ActionListener {
     }
 }
 
+/**
+	GUI object
+*/
 class GUI extends JFrame {
 
 
-	public static void main(String [] args){
-		new GUI();
-	}
-
+	// Camera images
     JLabel camera1;
     JLabel camera2;
-    JButton button;
+    
+    // Connection buttons
     JButton connectCamera1;
     JButton connectCamera2;
     JButton disconnectCamera1;
     JButton disconnectCamera2;
+    
+    // Text below the connection buttons
     JLabel delay1, fps1, movement1;
-        
     JLabel delay2, fps2, movement2;
     
+    // Radio buttons at the bottom
     JRadioButton movie, idle, auto, sync, async;
     
+    // True if respective camera is connected
     boolean camera1connected = false;
     boolean camera2connected = false;
     
     public GUI() {
         super();
         
+        // Default camera image at the start
         ImageIcon icon = new ImageIcon("../camera.jpeg");
         
+        
+        // Initialize all the objects
     	camera1 = new JLabel(icon);
     	camera2 = new JLabel(icon);
         
@@ -129,38 +144,49 @@ class GUI extends JFrame {
         sync.addActionListener(new SynchronizeButtonHandler(this, 1));
         async.addActionListener(new SynchronizeButtonHandler(this, 2));
 		
+		// Main outside content pane
 		Container pane = this.getContentPane();
 		
+		// Left pane with camera 1 connection buttons & labels
 		Container left = new Container();
 		left.setLayout(new GridBagLayout());
+		
+		// Right pane with camera 2 connection buttons & labels
 		Container right = new Container();
 		right.setLayout(new GridBagLayout());
 		
+		// Bottom left pane with movement options
 		Container bottom_left = new Container();
 		bottom_left.setLayout(new GridBagLayout());
 		
+		// Bottom right pane with synchronize options
 		Container bottom_right = new Container();
 		bottom_right.setLayout(new GridBagLayout());
 		
 		GridBagConstraints c = new GridBagConstraints();
 		
+		// Camera connection buttons
 		c.gridx = 0;
 		c.gridy = 0;
 		left.add(connectCamera1, c);
 		right.add(connectCamera2, c);
 		
+		// Camera disconnection buttons
 		c.gridy = 1;
 		left.add(disconnectCamera1, c);
 		right.add(disconnectCamera2, c);
 		
+		// Camera delay labels
 		c.gridy = 2;
 		left.add(delay1, c);
 		right.add(delay2, c);
 		
+		// Camera FPS labels
 		c.gridy = 3;
 		left.add(fps1, c);
 		right.add(fps2, c);
 		
+		// Camera Movement labels
 		c.gridy = 4;
 		left.add(movement1, c);
 		right.add(movement2, c);
@@ -169,15 +195,18 @@ class GUI extends JFrame {
 		// just reusing this, new object for default vals
 		c = new GridBagConstraints();
 		
+		// First row of bottom; movie and sync radio buttons
 		c.gridx = 0;
 		c.gridy = 0;
 		bottom_left.add(movie, c);
 		bottom_right.add(sync, c);
 		
+		// Second row, idle and async radio buttons
 		c.gridy = 1;
 		bottom_left.add(idle, c);
 		bottom_right.add(async, c);
 		
+		// Last row. Auto movement
 		c.gridy = 2;
 		bottom_left.add(auto, c);
 		
@@ -220,8 +249,11 @@ class GUI extends JFrame {
         updateButtons();
     }
     
-    // Toggles connection. 1 for camera 1 and 2 for camera 2.
-    // NOTE: We likely want to gray out ALL buttons during the connection and disconnection process. Implement this when we get there.
+    /** Toggles connection. 1 for camera 1 and 2 for camera 2.
+     	NOTE: We likely want to gray out ALL buttons during the connection and disconnection process. Implement this when we get there.
+    	
+    	Right now this is only a GUI 
+    */
     public void toggleConnection(int camera){
     	if(camera == 1)
     		camera1connected = !camera1connected;
@@ -290,7 +322,6 @@ class GUI extends JFrame {
 		 		break;
 		 }
 	}
-	
 	
 	public void updateCamera1(byte[] data) {
         Image theImage = getToolkit().createImage(data);

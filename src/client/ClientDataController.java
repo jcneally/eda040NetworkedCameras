@@ -116,12 +116,13 @@ public class ClientDataController extends Thread {
         }
         catch (IOException e) {
             System.out.println("Error when receiving image.");
-            return;
+            System.out.println(e.getMessage());
+	    return;
         }
 	}
 
 	public void run(){
 		receiveData(serverCamera1,portCamera1,bufferCamera1);
-		receiveData(serverCamera2,portCamera2,bufferCamera2);
+	//	receiveData(serverCamera2,portCamera2,bufferCamera2);
 	}
 }
