@@ -110,8 +110,7 @@ public class ClientDataController extends Thread {
             sock.close();
             
             camera.putJPEG(jpeg);
-            System.out.println("Received image data ("
-                               + bytesRead + " bytes).");
+            //System.out.println("Received image data ("+ bytesRead + " bytes).");
 
         }
         catch (IOException e) {

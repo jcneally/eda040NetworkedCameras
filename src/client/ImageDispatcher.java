@@ -1,5 +1,6 @@
 package client;
 
+import se.lth.cs.cameraproxy.Axis211A;
 import se.lth.cs.realtime.event.Buffer;
 
 
@@ -15,12 +16,12 @@ public class ImageDispatcher extends Thread{
 	JPEGBuffer bufferCamera2;
 	GUI gui;
 	
-	private int delayCamera1;
-	private int delayCamera2;
+	private long delayCamera1;
+	private long delayCamera2;
 	
 	private final int delayUpBound = 200; //Change this delay bound to switch to async, when test the program
 	private final int delayLowBound = 100; //Change this delay bound to switch to sync, when test the program
-	private final int delayMargin = 100; //Change this delay margin to adjust the acceptable difference delay while synchronized
+	private final int delayMargin = 5; //Change this delay margin to adjust the acceptable difference delay while synchronized
 	private final int SYNC = 1;
 	private final int ASYNC  = 2;
 	private final int AUTO = 0;
@@ -49,9 +50,22 @@ public class ImageDispatcher extends Thread{
 
 		case SYNC:
 			//return the most delayed image and the other with an added delay equal to the difference between both images delays
-			syncImages();
-			gui.updateCamera1(bufferCamera1.getJPEG());
-			gui.updateCamera2(bufferCamera2.getJPEG());		
+			
+			if((delayCamera1-delayCamera2)>delayMargin){
+				gui.updateCamera2(bufferCamera2.getJPEG());
+				System.out.println("delay1>delay2");
+			}else if((delayCamera2-delayCamera1)>delayMargin){
+				gui.updateCamera1(bufferCamera1.getJPEG());	
+				System.out.println("delay2>delay1");
+			}else{
+				gui.updateCamera1(bufferCamera1.getJPEG());
+				gui.updateCamera2(bufferCamera2.getJPEG());	
+			}
+			
+			
+//			syncImages();
+//			gui.updateCamera1(bufferCamera1.getJPEG());
+//			gui.updateCamera2(bufferCamera2.getJPEG());		
 			break;
 		
 		case ASYNC:
@@ -66,14 +80,14 @@ public class ImageDispatcher extends Thread{
 		//If the buffer allocate too many images, jump to the image according to the current time, and skip the old ones.
 		//Test it with the delay of the last image
 		if(delayCamera1>delayCamera2){
-			while(delayCamera1<(delayCamera2+delayMargin)){
+			if(delayCamera1<(delayCamera2+delayMargin)){
 				bufferCamera1.skipJPEG();
-				delayCamera1 = getDelay(CAMERA1);
+				//delayCamera1 = bufferCamera1.getCurrentDelay();
 			}
 		}else if(delayCamera1<delayCamera2){
-			while((delayCamera1+delayMargin)>delayCamera2){
+			if((delayCamera1+delayMargin)>delayCamera2){
 				bufferCamera2.skipJPEG();
-				delayCamera2 = getDelay(CAMERA2);
+				//delayCamera2 = bufferCamera2.getCurrentDelay();
 			}
 		}
 	}
@@ -91,15 +105,12 @@ public class ImageDispatcher extends Thread{
 		return SyncMode;
 	}
 	
-	private int getDelay(int camera){
-		//return the delay of the next image of 'camera'
-		
-		return 0;
-	}
-	
 	public void run(){
-		//delayCamera1 = getDelay(CAMERA1);
-		//delayCamera2 = getDelay(CAMERA2);
-		refreshImage(ASYNC);
+		while(true){
+		System.out.println("Delay 1: "+delayCamera1+" Delay 2: "+delayCamera2);
+		delayCamera1 = bufferCamera1.getCurrentDelay();
+		delayCamera2 = bufferCamera2.getCurrentDelay();
+		refreshImage(SYNC);
+		}
 	}
 }

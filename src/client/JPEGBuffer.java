@@ -17,6 +17,7 @@ class JPEGBuffer {
 	byte[][] buffData;	// The actual buffer.
 	int nextToPut;		// Writers index.
 	int nextToGet;		// Readers index.
+	long offset = 0l;
 
 	public JPEGBuffer() {
 		buffData = new byte[size][jpegsize];
@@ -46,6 +47,19 @@ class JPEGBuffer {
 		available--;
 		notifyAll();
 		return ans;
+	}
+	
+	synchronized long getCurrentDelay(){
+		//return the delay of the current image of 'camera'
+		try {
+			while(available == 0) wait();
+		} catch (InterruptedException e) {
+			throw new RTError("Buffer.getCurrentDelay interrupted:" + e);
+		}
+		byte[] data = buffData[nextToGet];
+		notifyAll();
+		long time = 1000L*(((data[25]<0?256+data[25]:data[25])<<24)+((data[26]<0?256+data[26]:data[26])<<16)+((data[27]<0?256+data[27]:data[27])<<8)+(data[28]<0?256+data[28]:data[28]))+10L*(data[29]<0?256+data[29]:data[29]);
+		return  (System.currentTimeMillis()-time-offset);
 	}
 	
 	synchronized void skipJPEG(){
