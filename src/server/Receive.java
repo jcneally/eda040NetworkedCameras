@@ -25,32 +25,18 @@ public class Receive extends Thread{
 	
 	public Receive(ServerMonitor serverMonitor) {
 		this.serverMonitor = serverMonitor;
-		len = 15;	// TODO: change to something appropriately
-		message = new byte[15];	// TODO: Change size!!!!
+		len = 10;	// TODO: change to something appropriately
+		message = new byte[10];	// TODO: Change size!!!!
 	}
 	
 	public void run() {
 
-		// Gets IllegalMonitorException if sleep less than 3 sec??? If no connection -> exception?
-		try {
-			sleep(3000);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
 		int test = 0;
 		while(true) {
 			test++;
 			// Wait for client to accept.
-			while((clientSocket = serverMonitor.getClientSocket()) == null) {
-				try {
-					wait();
-				} catch (InterruptedException e) {
-					System.out.println("Receive: Faild waiting for socket.");
-					e.printStackTrace();
-				}
-			}
+			clientSocket = serverMonitor.waitForClientSocket();
+			System.out.println("Receive: clientSocket = " + serverMonitor.getClientSocket());
 			
 			// Get input stream.
 			try {
@@ -73,9 +59,13 @@ public class Receive extends Thread{
 				System.out.print(message[i] + " ");
 			}
 			System.out.println();
+			
+			handleMessage();
 		}	
 		
 	}
 	
-	
+	private void handleMessage() {
+		// TODO: Implement message handling.
+	}
 }

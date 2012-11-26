@@ -49,4 +49,17 @@ public class ServerMonitor {
 		this.clientSocket = clientSocket;
 		notifyAll();
 	}
+	
+	public synchronized Socket waitForClientSocket() {
+		while(clientSocket == null) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				System.out.println("Receive: Faild waiting for socket.");
+				e.printStackTrace();
+			}
+		}
+		
+		return clientSocket;
+	}
 }

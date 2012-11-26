@@ -4,6 +4,7 @@ package server;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -13,6 +14,7 @@ import se.lth.cs.fakecamera.Axis211A;
 public class TestConnection extends Thread{
 	Socket socket;
 	InputStream is;
+	OutputStream os;
 	int port;
 
 	public TestConnection(int port) {
@@ -34,6 +36,8 @@ public class TestConnection extends Thread{
 			System.out.println("Client: socket created");
 			is = socket.getInputStream();
 			System.out.println("Client: inputstream got");
+			os = socket.getOutputStream();
+			System.out.println("Client: outputstream got");
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			System.out.println("Client: Catched unknown host exc..");
@@ -43,18 +47,27 @@ public class TestConnection extends Thread{
 		}
 
 		while(socket.isConnected()) {
-			try {
-				is.read(jpeg, 0, 15);
-//				System.out.print("Client read: ");
-				for(int i = 0; i < 15 ; i++) {
-//					System.out.print(jpeg[i] + " ");
-				}
-//				System.out.println();
-
-			} catch (IOException e) {
-				System.out.println("Client: Failed to read bytes");
-				//e.printStackTrace();
+//			try {
+//				is.read(jpeg, 0, 15);
+////				System.out.print("Client read: ");
+//				for(int i = 0; i < 15 ; i++) {
+////					System.out.print(jpeg[i] + " ");
+//				}
+////				System.out.println();
+			byte[] message = new byte[10];
+			for (int i = 0; i < message.length; i++) {
+				message[i] = (byte) i;
 			}
+			try {
+				os.write(message);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+//			} catch (IOException e) {
+//				System.out.println("Client: Failed to read bytes");
+//				//e.printStackTrace();
+//			}
 		}
 
 		// end of clentConnect-----------------------------------

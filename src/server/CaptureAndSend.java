@@ -26,7 +26,6 @@ public class CaptureAndSend extends Thread{
 	private Socket clientSocket;
 	private OutputStream os;
 	private int port;
-	private int mode;												// 0 for IDLE_MODE and 1 for MOVIE_MODE.
 	private int idleSleepTime;										// Time to sleep when in idle mode is idleSleepTime * detectSleepTime.
 	private long detectSleepTime;
 	
@@ -93,7 +92,7 @@ public class CaptureAndSend extends Thread{
 				t = System.currentTimeMillis();
 				break;
 			case ServerMonitor.AUTO_MODE:
-				// TODO: Handle AUTO_MODE...
+				
 				for( int i = 0; i < idleSleepTime; i++) {
 					System.out.println("Server: motion = " + motionDetector.getLevel());
 					if(motionDetector.detect()) {
