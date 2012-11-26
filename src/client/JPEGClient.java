@@ -23,7 +23,7 @@ public class JPEGClient {
         JPEGBuffer buffer2 = new JPEGBuffer();
         
         String server1 = "localhost", server2 = "localhost";
-        int port1 = 6077, port2 = 6077;
+        int port1 = 6077, port2 = 6078;
 
         GUI gui = new GUI();
         

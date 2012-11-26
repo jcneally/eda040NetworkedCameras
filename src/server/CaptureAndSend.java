@@ -96,7 +96,7 @@ public class CaptureAndSend extends Thread{
 				for( int i = 0; i < idleSleepTime; i++) {
 					System.out.println("Server: motion = " + motionDetector.getLevel());
 					if(motionDetector.detect()) {
-						System.out.println("Server: Motion detected!");
+						//System.out.println("Server: Motion detected!");
 						// TODO: handle motion i.e. send message to client.
 						monitor.setMode(ServerMonitor.MOVIE_MODE);
 					}
@@ -138,6 +138,7 @@ public class CaptureAndSend extends Thread{
 	 * Get jpeg from camera. Prints first bytes for test.
 	 */
 	private void capture() {
+                jpeg = new byte[Axis211A.IMAGE_BUFFER_SIZE];
 		len = camera.getJPEG(jpeg, 0);		
 //		System.out.println("-----------");
 //		printByte();
@@ -182,7 +183,7 @@ public class CaptureAndSend extends Thread{
 		// create ServerSocket
 		try {
 			serverSocket = new ServerSocket(port);
-			System.out.println("Server:serverSocket created");
+			System.out.println("Server:serverSocket created at port " + port);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("Server: Failed to create socket with port: " + port);

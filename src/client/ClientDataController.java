@@ -15,7 +15,8 @@ public class ClientDataController extends Thread {
 	//	play with them concurrency save.                                      //
 	////////////////////////////////////////////////////////////////////////////
 	
-	
+
+    Socket camera1Sock, camera2Sock;	
 	String serverCamera1;
 	String serverCamera2;
     int portCamera1;
@@ -68,26 +69,20 @@ public class ClientDataController extends Thread {
     }
 	
 	private void receiveData(String server, int port, JPEGBuffer camera){
-	
+	System.out.println("in receivedata");	
 		try {
-            // Open a socket to the server, get the input/output streams
-            Socket sock = new Socket(server, port);
-            InputStream is = sock.getInputStream();
-            OutputStream os = sock.getOutputStream();
-
-            // Send a simple request, always for "/image.jpg"
-            putLine(os, "GET /image.jpg HTTP/1.0");
-            putLine(os, "");        // The request ends with an empty line
+            InputStream is = camera1Sock.getInputStream();
+            OutputStream os = camera1Sock.getOutputStream();
 
             // Read the first line of the response (status line)
-            String responseLine;
+            /*String responseLine;
             responseLine = getLine(is);
             System.out.println("HTTP server says '" + responseLine + "'.");
             // Ignore the following header lines up to the final empty one.
             do {
                 responseLine = getLine(is);
             } while (!(responseLine.equals("")));
-
+		*/
             // Now load the JPEG image.
             int bufferSize = jpeg.length;
             int bytesRead  = 0;
@@ -107,7 +102,7 @@ public class ClientDataController extends Thread {
                     bytesLeft -= status;
                 }
             } while (status >= 0);
-            sock.close();
+           // sock.close();
             
             camera.putJPEG(jpeg);
             //System.out.println("Received image data ("+ bytesRead + " bytes).");
@@ -121,7 +116,28 @@ public class ClientDataController extends Thread {
 	}
 
 	public void run(){
-		receiveData(serverCamera1,portCamera1,bufferCamera1);
-	//	receiveData(serverCamera2,portCamera2,bufferCamera2);
+	if(connect())
+          System.out.println("Successfully connected");
+	else
+          System.out.println("There was an error connecting.");
+        while(true){
+          receiveData(serverCamera1,portCamera1,bufferCamera1);
+        }	
+      //	receiveData(serverCamera2,portCamera2,bufferCamera2);
 	}
+
+  public boolean connect(){
+    System.out.println("Trying to connect to " + serverCamera1 + " at port " + portCamera1);
+    try{
+       camera1Sock = new Socket(serverCamera1, portCamera1);
+      return true;
+    } catch (java.net.UnknownHostException e){
+      System.out.println("Could not connect, unknown host");
+      return false;
+    } catch (java.io.IOException e){
+      System.out.println("IO Exception. Could not connect");
+      return false;
+    }
+  }
+
 }
