@@ -57,10 +57,11 @@ public class ImageDispatcher extends Thread{
 			}else if((delayCamera2-delayCamera1)>delayMargin){
 				gui.updateCamera1(bufferCamera1.getJPEG());	
 				System.out.println("delay2>delay1");
-			}else{
-				gui.updateCamera1(bufferCamera1.getJPEG());
-				gui.updateCamera2(bufferCamera2.getJPEG());	
 			}
+//			}else{
+//				gui.updateCamera1(bufferCamera1.getJPEG());
+//				gui.updateCamera2(bufferCamera2.getJPEG());	
+//			}
 			
 			
 //			syncImages();
@@ -76,21 +77,21 @@ public class ImageDispatcher extends Thread{
 		}
 	}
 	
-	private void syncImages(){
-		//If the buffer allocate too many images, jump to the image according to the current time, and skip the old ones.
-		//Test it with the delay of the last image
-		if(delayCamera1>delayCamera2){
-			if(delayCamera1<(delayCamera2+delayMargin)){
-				bufferCamera1.skipJPEG();
-				//delayCamera1 = bufferCamera1.getCurrentDelay();
-			}
-		}else if(delayCamera1<delayCamera2){
-			if((delayCamera1+delayMargin)>delayCamera2){
-				bufferCamera2.skipJPEG();
-				//delayCamera2 = bufferCamera2.getCurrentDelay();
-			}
-		}
-	}
+//	private void syncImages(){
+//		//If the buffer allocate too many images, jump to the image according to the current time, and skip the old ones.
+//		//Test it with the delay of the last image
+//		if(delayCamera1>delayCamera2){
+//			if(delayCamera1<(delayCamera2+delayMargin)){
+//				bufferCamera1.skipJPEG();
+//				//delayCamera1 = bufferCamera1.getCurrentDelay();
+//			}
+//		}else if(delayCamera1<delayCamera2){
+//			if((delayCamera1+delayMargin)>delayCamera2){
+//				bufferCamera2.skipJPEG();
+//				//delayCamera2 = bufferCamera2.getCurrentDelay();
+//			}
+//		}
+//	}
 	
 	private int controlSynchronization(int currentMode){
 		//If the delay is bigger than a bound, switch to asynchronous and viceversa
