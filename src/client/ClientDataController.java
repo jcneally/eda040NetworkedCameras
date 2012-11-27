@@ -24,7 +24,7 @@ public class ClientDataController extends Thread {
     byte [] jpeg = new byte[Axis211A.IMAGE_BUFFER_SIZE];
     JPEGBuffer bufferCamera1;
     JPEGBuffer bufferCamera2;
-        
+    
 	public ClientDataController(String server1, String server2 ,int port1, int port2, JPEGBuffer buffer1, JPEGBuffer buffer2){
 	    serverCamera1 = server1;
 	    portCamera1 = port1;
@@ -68,11 +68,11 @@ public class ClientDataController extends Thread {
         s.write(CRLF);
     }
 	
-	private void receiveData(String server, int port, JPEGBuffer camera){
-	System.out.println("in receivedata");	
+	private void receiveData(int cam, JPEGBuffer camera){
 		try {
-            InputStream is = camera1Sock.getInputStream();
-            OutputStream os = camera1Sock.getOutputStream();
+		
+            InputStream is = (cam == 1) ? camera1Sock.getInputStream() : camera2Sock.getInputStream();
+            //OutputStream os = camera1Sock.getOutputStream();
 
             // Read the first line of the response (status line)
             /*String responseLine;
@@ -84,28 +84,53 @@ public class ClientDataController extends Thread {
             } while (!(responseLine.equals("")));
 		*/
             // Now load the JPEG image.
-            int bufferSize = jpeg.length;
-            int bytesRead  = 0;
-            int bytesLeft  = bufferSize;
-            int status;
+            
+            //int bufferSize = jpeg.length;
+            //int bytesRead  = 0;
+            //int bytesLeft  = bufferSize;
+            //int status;
+            
+            // Read header - read is blocking
+			byte hi = (byte)is.read();
+			// If read returns -1 then end-of-stream has been reached
+			if (hi == -1) throw new IOException("End of stream");
+			byte lo = (byte)is.read();
+			if (lo == -1) throw new IOException("End of stream");
+				
+			// Calculate size of package
+			// Byte is signed. & 0xFF creates an int from the byte bit pattern, allowing
+			// for interpretation of byte values in the range 0-254. Leave 255 as it is
+			// used to indicate end-of-stream in read().
+			int size = (hi & 0xFF)*255 + (lo & 0xFF);
+            
 
+            // Read package
+			int read = 0; // Number of read bytes so far
+			while (read != size) {
+			    
+				// Read bytes and put in data array until size bytes are read
+				// Read returns number of bytes read <= size-read
+				int n = is.read(jpeg, read, size - read);
+				if (n == -1) throw new IOException("End of stream");
+				read += n;
+			}
             // We have to keep reading until -1 (meaning "end of file") is
             // returned. The socket (which the stream is connected to)
             // does not wait until all data is available; instead it
             // returns if nothing arrived for some (short) time.
-            do {
-                status = is.read(jpeg, bytesRead, bytesLeft);
+            //do {
+                //status = is.read(jpeg, bytesRead, bytesLeft);
                 // The 'status' variable now holds the no. of bytes read,
                 // or -1 if no more data is available
-                if (status > 0) {
-                    bytesRead += status;
-                    bytesLeft -= status;
-                }
-            } while (status >= 0);
-           // sock.close();
+           //     if (status > 0) {
+           //         bytesRead += status;
+           //         bytesLeft -= status;
+           //     }
+           // } while (status >= 0);
             
+           // sock.close();
+            //gui.updateCamera1(jpeg);
             camera.putJPEG(jpeg);
-            //System.out.println("Received image data ("+ bytesRead + " bytes).");
 
         }
         catch (IOException e) {
@@ -121,15 +146,16 @@ public class ClientDataController extends Thread {
 	else
           System.out.println("There was an error connecting.");
         while(true){
-          receiveData(serverCamera1,portCamera1,bufferCamera1);
-        }	
-      //	receiveData(serverCamera2,portCamera2,bufferCamera2);
+          receiveData(1,bufferCamera1);
+          receiveData(2,bufferCamera2);
+        }
 	}
 
   public boolean connect(){
     System.out.println("Trying to connect to " + serverCamera1 + " at port " + portCamera1);
     try{
        camera1Sock = new Socket(serverCamera1, portCamera1);
+       camera2Sock = new Socket(serverCamera2, portCamera2);
       return true;
     } catch (java.net.UnknownHostException e){
       System.out.println("Could not connect, unknown host");

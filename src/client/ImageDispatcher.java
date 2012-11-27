@@ -45,7 +45,6 @@ public class ImageDispatcher extends Thread{
 			mode = SynchronizationMode;
 		}
 	
-		
 		switch (mode){
 
 		case SYNC:
@@ -55,18 +54,19 @@ public class ImageDispatcher extends Thread{
 				gui.updateCamera2(bufferCamera2.getJPEG());
 				System.out.println("delay1>delay2");
 			}else if((delayCamera2-delayCamera1)>delayMargin){
+			    System.out.println("in second if");
 				gui.updateCamera1(bufferCamera1.getJPEG());	
 				System.out.println("delay2>delay1");
 			}
-//			}else{
-//				gui.updateCamera1(bufferCamera1.getJPEG());
-//				gui.updateCamera2(bufferCamera2.getJPEG());	
-//			}
+            else{
+				gui.updateCamera1(bufferCamera1.getJPEG());
+				gui.updateCamera2(bufferCamera2.getJPEG());	
+			}
 			
 			
 //			syncImages();
-//			gui.updateCamera1(bufferCamera1.getJPEG());
-//			gui.updateCamera2(bufferCamera2.getJPEG());		
+			gui.updateCamera1(bufferCamera1.getJPEG());
+			gui.updateCamera2(bufferCamera2.getJPEG());		
 			break;
 		
 		case ASYNC:

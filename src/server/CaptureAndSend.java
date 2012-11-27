@@ -138,7 +138,6 @@ public class CaptureAndSend extends Thread{
 	 * Get jpeg from camera. Prints first bytes for test.
 	 */
 	private void capture() {
-                jpeg = new byte[Axis211A.IMAGE_BUFFER_SIZE];
 		len = camera.getJPEG(jpeg, 0);		
 //		System.out.println("-----------");
 //		printByte();
@@ -149,16 +148,18 @@ public class CaptureAndSend extends Thread{
 	 * Gets outputstream and then writes the jpeg byte array to it.
 	 */
 	private void send() {
-		// Get outputstream
-		try {
-			os = clientSocket.getOutputStream();
-		} catch (IOException e) {
-			System.out.println("Server: /capture() Failed to get Outputstream");
-			e.printStackTrace();
-		}
 		// write        
 		try {
+		    // Create header
+			byte hi = (byte)(len / 255);
+			byte lo = (byte)(len % 255);
+				
+			// Send header
+			os.write(hi);
+			os.write(lo);
+		
 			os.write(jpeg,0,len);
+			os.flush();
 		} catch (IOException e) {
 			System.out.println("Server: /capture() Failed to write");
 			e.printStackTrace();
@@ -208,6 +209,15 @@ public class CaptureAndSend extends Thread{
 			e.printStackTrace();
 			System.out.println("Server: Failed to set TcpNoDelay");
 		}
+		
+		// Get outputstream
+		try {
+			os = clientSocket.getOutputStream();
+		} catch (IOException e) {
+			System.out.println("Server: /capture() Failed to get Outputstream");
+			e.printStackTrace();
+		}
+		
 	}
 	
 }

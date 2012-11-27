@@ -11,12 +11,12 @@ class JPEGBuffer {
 	//	also a method to skip images in case are not relevant (due to a high delay)  //
 	///////////////////////////////////////////////////////////////////////////////////
 	
-	int available;		// Number of lines that are available. 
+	int available = 0;		// Number of lines that are available. 
 	final int size=10;		// The max number of buffered lines.
 	final int jpegsize = Axis211A.IMAGE_BUFFER_SIZE;
 	byte[][] buffData;	// The actual buffer.
-	int nextToPut;		// Writers index.
-	int nextToGet;		// Readers index.
+	int nextToPut = 0;		// Writers index.
+	int nextToGet = 0;		// Readers index.
 	long offset = 0l;
 
 	public JPEGBuffer() {
@@ -30,7 +30,7 @@ class JPEGBuffer {
 			throw new RTError("Buffer.putJPEG interrupted: "+exc);
 		};
 		buffData[nextToPut] = inp;
-		if (++nextToPut >= size) nextToPut = 0;
+		if (++nextToPut == size) nextToPut = 0;
 		available++;
 		notifyAll(); // Only notify() could wake up another producer.
 	}
@@ -41,9 +41,9 @@ class JPEGBuffer {
 		} catch (InterruptedException e) {
 			throw new RTError("Buffer.getJPEG interrupted:" + e);
 		}
-		byte[] ans = buffData[nextToGet];
+		byte [] ans = buffData[nextToGet];
 		buffData[nextToGet] = null;
-		if(++nextToGet >= size) nextToGet = 0;
+		if(++nextToGet == size) nextToGet = 0;
 		available--;
 		notifyAll();
 		return ans;
@@ -51,6 +51,7 @@ class JPEGBuffer {
 	
 	synchronized long getCurrentDelay(){
 		//return the delay of the current image of 'camera'
+		
 		try {
 			while(available == 0) wait();
 		} catch (InterruptedException e) {
