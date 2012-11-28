@@ -26,7 +26,7 @@ public class CaptureAndSend extends Thread{
 	private Socket clientSocket;
 	private OutputStream os;
 	private int port;
-	private int idleWaitTime;										// Time to "wait" when in idle mode. 
+	private int idleSendTime;										// Time to "wait" for sending when in idle mode. 
 
 	
 	/**
@@ -37,7 +37,7 @@ public class CaptureAndSend extends Thread{
 		camera = new Axis211A();
 		this.port = port;
 		
-		idleWaitTime = 5000;		// 5 sec.
+		idleSendTime = 5000;		// 5 sec.
 		
 		this.monitor = monitor;
 		motionDetector = new MotionDetector();
@@ -49,18 +49,22 @@ public class CaptureAndSend extends Thread{
 	 * detects motion and send to client.
 	 */
 	public void run(){
-		long t = System.currentTimeMillis();
+		
 
 		while(true){
 
 			connectCamera();
 			connectClient();
+			
 			boolean detectHalf = true; // For performance, detect only half.
+			long t = System.currentTimeMillis();
+			boolean sent = false;
 			while(clientSocket.isConnected()) {
 				capture();
+				
 				if(detectHalf) {
 					if(motionDetector.detect()) {
-						System.out.println("Server: Motion detected!");
+						//System.out.println("Server: Motion detected!");
 						// TODO: handle motion i.e. send message to client.
 						if(monitor.getMode() == ServerMonitor.AUTO_MODE) {
 							monitor.setMode(ServerMonitor.MOVIE_MODE);
@@ -72,9 +76,11 @@ public class CaptureAndSend extends Thread{
 
 				switch (monitor.getMode()) {
 				case ServerMonitor.IDLE_MODE:
-					if(System.currentTimeMillis() > t) {
-						t += idleWaitTime;
+					if(System.currentTimeMillis() >= t && !sent) {
+						System.out.println("now: " + System.currentTimeMillis() + " t: " + t);
+						t += idleSendTime;
 						send();
+						sent = true;
 					}
 					break;
 				case ServerMonitor.MOVIE_MODE:
@@ -83,7 +89,7 @@ public class CaptureAndSend extends Thread{
 					break;
 				case ServerMonitor.AUTO_MODE:
 					if(System.currentTimeMillis() > t) {
-						t += idleWaitTime;
+						t += idleSendTime;
 						send();
 					}
 					break;

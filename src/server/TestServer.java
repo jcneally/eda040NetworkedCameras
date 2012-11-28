@@ -11,6 +11,7 @@ public class TestServer {
 	
 	public static void main(String[] args) throws InterruptedException {
 		ServerMonitor mon = new ServerMonitor();
+		mon.setMode(ServerMonitor.IDLE_MODE);
 		System.out.println("before start...");
 		
 		//Start captureAndSend (server)
