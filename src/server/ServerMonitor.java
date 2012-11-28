@@ -60,6 +60,7 @@ public class ServerMonitor {
 				System.out.println("Server: Failed to write");
 				e.printStackTrace();
 			}
+			commandSent = true;
 		}
 	}
 	
