@@ -16,17 +16,19 @@ public class CommandController extends Thread{
 		while(true) {
 
 			clientSocket = serverMonitor.getClientSocket();
+			if(clientSocket != null) {
+				try {
+					os = clientSocket.getOutputStream();
+				} catch (IOException e) {
+					System.out.println("CommandController: Failed to get output stream. Get new connection.");
+					continue;
+				}
 
-			try {
-				os = clientSocket.getOutputStream();
-			} catch (IOException e) {
-				System.out.println("CommandController: Failed to get output stream. Get new connection.");
-				continue;
-			}
 
+				while(clientSocket.isConnected()) {
+					serverMonitor.sendCommand(os);
+				}
 
-			while(clientSocket.isConnected()) {
-				serverMonitor.sendCommand(os);
 			}
 		}
 	}
