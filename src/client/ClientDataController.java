@@ -68,28 +68,11 @@ public class ClientDataController extends Thread {
         s.write(CRLF);
     }
 	
-	private void receiveData(int cam, JPEGBuffer camera){
+	private void receiveData(int cam, JPEGBuffer buffer){
 		try {
 		
             InputStream is = (cam == 1) ? camera1Sock.getInputStream() : camera2Sock.getInputStream();
-            //OutputStream os = camera1Sock.getOutputStream();
-
-            // Read the first line of the response (status line)
-            /*String responseLine;
-            responseLine = getLine(is);
-            System.out.println("HTTP server says '" + responseLine + "'.");
-            // Ignore the following header lines up to the final empty one.
-            do {
-                responseLine = getLine(is);
-            } while (!(responseLine.equals("")));
-		*/
-            // Now load the JPEG image.
-            
-            //int bufferSize = jpeg.length;
-            //int bytesRead  = 0;
-            //int bytesLeft  = bufferSize;
-            //int status;
-            
+    
             // Read header - read is blocking
 			byte hi = (byte)is.read();
 			// If read returns -1 then end-of-stream has been reached
@@ -102,35 +85,16 @@ public class ClientDataController extends Thread {
 			// for interpretation of byte values in the range 0-254. Leave 255 as it is
 			// used to indicate end-of-stream in read().
 			int size = (hi & 0xFF)*255 + (lo & 0xFF);
+			
+			byte command = (byte)is.read();
+            int is_command = (command & 0xFF);
             
-
-            // Read package
-			int read = 0; // Number of read bytes so far
-			while (read != size) {
-			    
-				// Read bytes and put in data array until size bytes are read
-				// Read returns number of bytes read <= size-read
-				int n = is.read(jpeg, read, size - read);
-				if (n == -1) throw new IOException("End of stream");
-				read += n;
-			}
-            // We have to keep reading until -1 (meaning "end of file") is
-            // returned. The socket (which the stream is connected to)
-            // does not wait until all data is available; instead it
-            // returns if nothing arrived for some (short) time.
-            //do {
-                //status = is.read(jpeg, bytesRead, bytesLeft);
-                // The 'status' variable now holds the no. of bytes read,
-                // or -1 if no more data is available
-           //     if (status > 0) {
-           //         bytesRead += status;
-           //         bytesLeft -= status;
-           //     }
-           // } while (status >= 0);
-            
-           // sock.close();
-            //gui.updateCamera1(jpeg);
-            camera.putJPEG(jpeg);
+            if(is_command == 1){
+                handle_command(is, cam);
+            }
+            else {
+                handle_jpeg(is, size, buffer);
+            }
 
         }
         catch (IOException e) {
@@ -138,6 +102,43 @@ public class ClientDataController extends Thread {
             System.out.println(e.getMessage());
 	    return;
         }
+	}
+	
+	// Commands are:
+	// 1 - Camera goes to IDLE, send images every 5 secs
+	// 2 - Camera goes to MOVIE, send images constantly
+	// 3 - Camera goes to AUTO, should tell the client about movement
+	// OBS:  Commands are ALWAYS sent to both servers
+	public void send_command(int command) throws IOException{
+	    OutputStream os = camera1Sock.getOutputStream();
+	    OutputStream os2 = camera2Sock.getOutputStream();
+	    os.write( (byte)command );
+	    os2.write( (byte)command );
+	}
+	
+	// camera is 1 or 2
+	public void handle_command(InputStream is, int camera) throws IOException{
+	    int command = (is.read() & 0xFF);
+	    if(command == -1) throw new IOException("Expected valid command but was not valid");
+	    System.out.println("The command sent from camera " + camera + " was " + command);
+	}
+	
+	// Params:
+	// is - Input stream to use for the JPEG
+	// size - size of JPEG image from header
+	// buffer - JPEG buffer to put the image in.
+	public void handle_jpeg(InputStream is, int size, JPEGBuffer buffer) throws IOException{
+	    // Read package
+	    int read = 0; // Number of read bytes so far
+	    while (read != size) {
+			    
+    	    // Read bytes and put in data array until size bytes are read
+    		// Read returns number of bytes read <= size-read
+			int n = is.read(jpeg, read, size - read);
+	    	if (n == -1) throw new IOException("End of stream");
+	    		read += n;
+	    }
+        buffer.putJPEG(jpeg);
 	}
 
 	public void run(){

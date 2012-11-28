@@ -23,9 +23,12 @@ public class JPEGClient {
         String server1 = "localhost", server2 = "localhost";
         int port1 = 6077, port2 = 6078;
 
-        GUI gui = new GUI();
-        
         ClientDataController clientDataController = new ClientDataController(server1,server2,port1,port2,buffer1,buffer2); 
+
+        // CHANGE this later but right now using it to test sending commands
+        GUI gui = new GUI(clientDataController);
+        
+        
         ImageDispatcher imageDispatcher = new ImageDispatcher(buffer1, buffer2, gui);
         
         clientDataController.start();

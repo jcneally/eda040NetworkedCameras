@@ -77,6 +77,8 @@ class SynchronizeButtonHandler implements ActionListener {
 */
 class GUI extends JFrame {
 
+    // REMOVE THIS LATER PLEASE THANK U
+    ClientDataController cont;
 
 	// Camera images
     JLabel camera1;
@@ -99,9 +101,10 @@ class GUI extends JFrame {
     boolean camera1connected = false;
     boolean camera2connected = false;
     
-    public GUI() {
+    public GUI(ClientDataController d) {
         super();
         
+        cont = d;
         // Default camera image at the start
         ImageIcon icon = new ImageIcon("../camera.jpeg");
         
@@ -293,18 +296,25 @@ class GUI extends JFrame {
 		 movie.setSelected(false);
 		 idle.setSelected(false);
 		 auto.setSelected(false);
+		 try{
 		 
 		 switch(num){
 		 	case 1:
 		 		movie.setSelected(true);
+		 		cont.send_command(1);
 		 		break;
 		 	case 2:
 		 		idle.setSelected(true);
+		 		cont.send_command(2);
 		 		break;
 		 	case 3:
 		 		auto.setSelected(true);
+		 		cont.send_command(3);
 		 		break;
 		 }
+		 
+		 } catch(java.io.IOException e)
+		 { System.out.println("IO Exception"); }
 	}
 	
 	// sets the Sync mode based on a number 1 - 2 (sequentially vertical)
