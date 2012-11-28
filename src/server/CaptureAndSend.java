@@ -58,13 +58,13 @@ public class CaptureAndSend extends Thread{
 			
 			boolean detectHalf = true; // For performance, detect only half.
 			long t = System.currentTimeMillis();
-			boolean sent = false;
+			
 			while(clientSocket.isConnected()) {
 				capture();
 				
 				if(detectHalf) {
 					if(motionDetector.detect()) {
-						//System.out.println("Server: Motion detected!");
+						System.out.println("Server: Motion detected!");
 						// TODO: handle motion i.e. send message to client.
 						if(monitor.getMode() == ServerMonitor.AUTO_MODE) {
 							monitor.setMode(ServerMonitor.MOVIE_MODE);
@@ -76,11 +76,10 @@ public class CaptureAndSend extends Thread{
 
 				switch (monitor.getMode()) {
 				case ServerMonitor.IDLE_MODE:
-					if(System.currentTimeMillis() >= t && !sent) {
+					if(System.currentTimeMillis() >= t) {
 						System.out.println("now: " + System.currentTimeMillis() + " t: " + t);
 						t += idleSendTime;
 						send();
-						sent = true;
 					}
 					break;
 				case ServerMonitor.MOVIE_MODE:
@@ -145,12 +144,16 @@ public class CaptureAndSend extends Thread{
 
 	/**
 	 * Tries to connect to camera. If not possible, exit system.
-	 * TODO: Handle connection problem.
 	 */
 	private void connectCamera() {
-		if(!camera.connect()) {
+			
+		while(!camera.connect()) {
 			System.out.println("Server: Camera failed to connect!");
-			System.exit(1);
+			try {
+				sleep(2000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
