@@ -26,8 +26,8 @@ public class CaptureAndSend extends Thread{
 	private Socket clientSocket;
 	private OutputStream os;
 	private int port;
-	private int idleSleepTime;										// Time to sleep when in idle mode is idleSleepTime * detectSleepTime.
-	private long detectSleepTime;
+	private int idleWaitTime;										// Time to "wait" when in idle mode. 
+
 	
 	/**
 	 * Constructor, creates a fake camera and gets port nbr.
@@ -36,8 +36,8 @@ public class CaptureAndSend extends Thread{
 	public CaptureAndSend(int port, ServerMonitor monitor) {
 		camera = new Axis211A();
 		this.port = port;
-		detectSleepTime = 1000; // 1 sec.
-		idleSleepTime = 5;		// 5 detectSleepTimes.
+		
+		idleWaitTime = 5000;		// 5 sec.
 		
 		this.monitor = monitor;
 		motionDetector = new MotionDetector();
@@ -50,79 +50,53 @@ public class CaptureAndSend extends Thread{
 	 */
 	public void run(){
 		long t = System.currentTimeMillis();
-		long diff;
 
 		while(true){
 
-		connectCamera();
-		connectClient();
-		
-		while(clientSocket.isConnected()) {
-			capture();			
-			send();				
-			
-			// Handle mode. Sleep and detect appropriately. 
-			switch (monitor.getMode()) {
-			case ServerMonitor.IDLE_MODE:
-
-				for( int i = 0; i < idleSleepTime; i++) {
-					System.out.println("Server: motion = " + motionDetector.getLevel());
+			connectCamera();
+			connectClient();
+			boolean detectHalf = true; // For performance, detect only half.
+			while(clientSocket.isConnected()) {
+				capture();
+				if(detectHalf) {
 					if(motionDetector.detect()) {
 						System.out.println("Server: Motion detected!");
 						// TODO: handle motion i.e. send message to client.
-					}
-					t += detectSleepTime;
-					diff = t - System.currentTimeMillis();
-					if(diff > 0) {
-						try {
-							sleep(diff);
-						} catch (InterruptedException e) {
-							e.printStackTrace();						
+						if(monitor.getMode() == ServerMonitor.AUTO_MODE) {
+							monitor.setMode(ServerMonitor.MOVIE_MODE);
 						}
 					}
 				}
+				detectHalf = !detectHalf;
 
-				break;
-			case ServerMonitor.MOVIE_MODE:
-				System.out.println("Server: motion = " + motionDetector.getLevel());
-				if(motionDetector.detect()) {	// TODO: possibly add something so that detect does not run every time.
-					System.out.println("Server: Motion detected!");
-					// TODO: handle motion i.e. send message to client.
-				}
-				t = System.currentTimeMillis();
-				break;
-			case ServerMonitor.AUTO_MODE:
-				
-				for( int i = 0; i < idleSleepTime; i++) {
-					System.out.println("Server: motion = " + motionDetector.getLevel());
-					if(motionDetector.detect()) {
-						//System.out.println("Server: Motion detected!");
-						// TODO: handle motion i.e. send message to client.
-						monitor.setMode(ServerMonitor.MOVIE_MODE);
+
+				switch (monitor.getMode()) {
+				case ServerMonitor.IDLE_MODE:
+					if(System.currentTimeMillis() > t) {
+						t += idleWaitTime;
+						send();
 					}
-					t += detectSleepTime;
-					diff = t - System.currentTimeMillis();
-					if(diff > 0) {
-						try {
-							sleep(diff);
-						} catch (InterruptedException e) {
-							e.printStackTrace();						
-						}
+					break;
+				case ServerMonitor.MOVIE_MODE:
+					t = System.currentTimeMillis();
+					send();
+					break;
+				case ServerMonitor.AUTO_MODE:
+					if(System.currentTimeMillis() > t) {
+						t += idleWaitTime;
+						send();
 					}
+					break;
+
+				default:
+						System.out.println("Mode does not exist!");
+						System.exit(1);
+						break;
 				}
-
-				
-				break;
-
-			default:
-				System.out.println("int does not correspond to a mode!");
-				System.exit(1);
-				break;
-			}
-			// end of sleep/detect handling
-		}
+			} 
 		}
 	}
+
 
 	/**
 	 * For testing...
@@ -138,10 +112,7 @@ public class CaptureAndSend extends Thread{
 	 * Get jpeg from camera. Prints first bytes for test.
 	 */
 	private void capture() {
-		len = camera.getJPEG(jpeg, 0);		
-//		System.out.println("-----------");
-//		printByte();
-//		System.out.println("-----------");		
+		len = camera.getJPEG(jpeg, 0);	
 	}
 
 	/**

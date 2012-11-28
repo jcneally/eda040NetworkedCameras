@@ -47,27 +47,27 @@ public class TestConnection extends Thread{
 		}
 
 		while(socket.isConnected()) {
-//			try {
-//				is.read(jpeg, 0, 15);
-////				System.out.print("Client read: ");
-//				for(int i = 0; i < 15 ; i++) {
-////					System.out.print(jpeg[i] + " ");
-//				}
-////				System.out.println();
-			byte[] message = new byte[10];
-			for (int i = 0; i < message.length; i++) {
-				message[i] = (byte) i;
-			}
 			try {
-				os.write(message);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-//			} catch (IOException e) {
-//				System.out.println("Client: Failed to read bytes");
-//				//e.printStackTrace();
+				is.read(jpeg, 0, 15);
+				System.out.print("Client read: ");
+				for(int i = 0; i < 15 ; i++) {
+					System.out.print(jpeg[i] + " ");
+				}
+				System.out.println();
+//			byte[] message = new byte[10];
+//			for (int i = 0; i < message.length; i++) {
+//				message[i] = (byte) i;
 //			}
+//			try {
+//				os.write(message);
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+			} catch (IOException e) {
+				System.out.println("Client: Failed to read bytes");
+				//e.printStackTrace();
+			}
 		}
 
 		// end of clentConnect-----------------------------------

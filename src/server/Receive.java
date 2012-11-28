@@ -2,12 +2,7 @@ package server;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
-
-import se.lth.cs.fakecamera.Axis211A;
-
 
 /**
  * 
@@ -31,9 +26,9 @@ public class Receive extends Thread{
 	
 	public void run() {
 
-		int test = 0;
+		
 		while(true) {
-			test++;
+			
 			// Wait for client to accept.
 			clientSocket = serverMonitor.waitForClientSocket();
 			System.out.println("Receive: clientSocket = " + serverMonitor.getClientSocket());
