@@ -15,13 +15,10 @@ public class Receive extends Thread{
 	private Socket clientSocket;
 	private ServerMonitor serverMonitor;
 	private InputStream is;
-	private byte[] message;
-	private int len;
+	private int receivedMode;
 	
 	public Receive(ServerMonitor serverMonitor) {
 		this.serverMonitor = serverMonitor;
-		len = 10;	// TODO: change to something appropriately
-		message = new byte[10];	// TODO: Change size!!!!
 	}
 	
 	public void run() {
@@ -43,24 +40,15 @@ public class Receive extends Thread{
 			
 			// Read
 			try {
-				is.read(message, 0, len);
+				serverMonitor.setMode(is.read());
 			} catch (IOException e) {
 				System.out.println("Receive: Failed to get input stream. Get new connection.");
 				continue;
 			}
-			
-			System.out.print("Receive: read ");			
-			for (int i = 0; i < 10; i++) {
-				System.out.print(message[i] + " ");
-			}
-			System.out.println();
-			
-			handleMessage();
+						
 		}	
 		
 	}
 	
-	private void handleMessage() {
-		// TODO: Implement message handling.
-	}
+	
 }

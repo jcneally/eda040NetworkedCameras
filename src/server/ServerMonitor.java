@@ -1,6 +1,9 @@
 package server;
 
 import se.lth.cs.fakecamera.Axis211A;
+
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.*;
 
 /**
@@ -14,6 +17,7 @@ public class ServerMonitor {
 	byte [] jpeg = new byte[Axis211A.IMAGE_BUFFER_SIZE];
 	int mode;
 	Socket clientSocket = null;
+	boolean commandSent = true;
 	
 	final static int IDLE_MODE = 0;
 	final static int MOVIE_MODE = 1;
@@ -39,6 +43,24 @@ public class ServerMonitor {
 	
 	public synchronized void setMode(int mode) {
 		this.mode = mode;
+		commandSent = false;
+		notifyAll();
+	}
+	
+	public synchronized void sendCommand(OutputStream os) {
+		while(!commandSent) {
+			byte one = (byte) 1;
+								
+			try {
+				os.write(one);
+				os.write(mode);
+				os.flush();			
+				
+			} catch (IOException e) {
+				System.out.println("Server: Failed to write");
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public synchronized Socket getClientSocket() {

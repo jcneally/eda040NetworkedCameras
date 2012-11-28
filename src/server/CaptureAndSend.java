@@ -134,10 +134,13 @@ public class CaptureAndSend extends Thread{
 			os.write(hi);
 			os.write(lo);
 		
+			byte zero = (byte) 0;
+			
+			os.write(zero);
 			os.write(jpeg,0,len);
 			os.flush();
 		} catch (IOException e) {
-			System.out.println("Server: /capture() Failed to write");
+			System.out.println("Server: Failed to write");
 			e.printStackTrace();
 		}        
 	}
