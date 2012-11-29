@@ -65,6 +65,9 @@ public class CaptureAndSend extends Thread{
 					if(motionDetector.detect()) {
 						if(monitor.getMode() == ServerMonitor.AUTO_MODE) {
 							monitor.setMode(ServerMonitor.MOVIE_MODE);
+							if(monitor.sendCommand(os)) {
+								break;	// something is wrong with connection so break loop and get new.
+							}
 						}
 					}
 				}

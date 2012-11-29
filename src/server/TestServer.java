@@ -20,8 +20,8 @@ public class TestServer {
 		System.out.println("Server up and running");
 		Receive receive = new Receive(mon);
 		receive.start();
-		CommandController commandController = new CommandController(mon);
-		commandController.start();
+//		CommandController commandController = new CommandController(mon);
+//		commandController.start();
 		
 		//Start TestConnection (client)
 		TestConnection testConnection = new TestConnection(port);
@@ -33,6 +33,7 @@ public class TestServer {
 		mon.setMode(1);
 		Thread.sleep(1000);
 		mon.setMode(2);
+		
 		//Close socket
 		Thread.sleep(30000);
 		testConnection.closeSocket();
