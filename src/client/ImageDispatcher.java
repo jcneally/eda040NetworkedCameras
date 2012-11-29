@@ -12,8 +12,7 @@ public class ImageDispatcher extends Thread{
 	//	images to the GUI, and make them available to the user view.                     //
 	///////////////////////////////////////////////////////////////////////////////////////
 	
-	JPEGBuffer bufferCamera1;
-	JPEGBuffer bufferCamera2;
+	ClientMonitor monitor;
 	GUI gui;
 	
 	private int delayCamera1;
@@ -32,9 +31,8 @@ public class ImageDispatcher extends Thread{
 	long updateTime;
 	int mode = ASYNC;
 	
-	public ImageDispatcher(JPEGBuffer buffer1, JPEGBuffer buffer2, GUI gui){
-		bufferCamera1 = buffer1;
-		bufferCamera2 = buffer2;
+	public ImageDispatcher(ClientMonitor m, GUI gui){
+		monitor = m;
 		this.gui = gui;
 	}
 	
@@ -58,13 +56,12 @@ public class ImageDispatcher extends Thread{
 				gui.updateCamera2(bufferCamera2.getJPEG());	
 				updateTime = System.currentTimeMillis();
 			}
-			
 			break;
 		
 		case ASYNC:
 			//return the current image
-			gui.updateCamera1(bufferCamera1.getJPEG());
-			gui.updateCamera2(bufferCamera2.getJPEG());			
+			gui.updateCamera1(monitor.bufferCamera1.getJPEG());
+			gui.updateCamera2(monitor.bufferCamera2.getJPEG());			
 			break;
 		}
 	}

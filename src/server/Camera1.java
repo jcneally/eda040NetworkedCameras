@@ -15,7 +15,7 @@ public class Camera1 {
 		
 		captureAndSend.start();
 		receive.start();
-		commandController.start();
+		//commandController.start();
 		
 		System.out.println("Server up and running");
 	}

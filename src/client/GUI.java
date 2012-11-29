@@ -77,8 +77,7 @@ class SynchronizeButtonHandler implements ActionListener {
 */
 class GUI extends JFrame {
 
-    // REMOVE THIS LATER PLEASE THANK U
-    ClientDataController cont;
+    ClientMonitor monitor;
 
 	// Camera images
     JLabel camera1;
@@ -101,10 +100,10 @@ class GUI extends JFrame {
     boolean camera1connected = false;
     boolean camera2connected = false;
     
-    public GUI(ClientDataController d) {
+    public GUI(ClientMonitor mon) {
         super();
         
-        cont = d;
+        monitor = mon;
         // Default camera image at the start
         ImageIcon icon = new ImageIcon("../camera.jpeg");
         
@@ -301,15 +300,15 @@ class GUI extends JFrame {
 		 switch(num){
 		 	case 1:
 		 		movie.setSelected(true);
-		 		cont.send_command(1);
+		 		monitor.send_command(1);
 		 		break;
 		 	case 2:
 		 		idle.setSelected(true);
-		 		cont.send_command(2);
+		 		monitor.send_command(2);
 		 		break;
 		 	case 3:
 		 		auto.setSelected(true);
-		 		cont.send_command(3);
+		 		monitor.send_command(3);
 		 		break;
 		 }
 		 
