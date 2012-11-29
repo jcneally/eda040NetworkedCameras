@@ -1,7 +1,5 @@
 package server;
 
-
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,13 +22,6 @@ public class TestConnection extends Thread{
 	public void run() {
 		//clientconnect--------------------------------------------------
 
-		byte[] jpeg = new byte[Axis211A.IMAGE_BUFFER_SIZE];
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
 		try {
 			socket  = new Socket("localhost", port);
 			System.out.println("Client: socket created");
@@ -47,30 +38,48 @@ public class TestConnection extends Thread{
 		}
 
 		while(socket.isConnected()) {
-			try {
-				is.read(jpeg, 0, 15);
-				System.out.print("Client read: ");
-				for(int i = 0; i < 15 ; i++) {
-					System.out.print(jpeg[i] + " ");
-				}
-				System.out.println();
-//			byte[] message = new byte[10];
-//			for (int i = 0; i < message.length; i++) {
-//				message[i] = (byte) i;
-//			}
-//			try {
-//				os.write(message);
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-			} catch (IOException e) {
-				System.out.println("Client: Failed to read bytes");
-				//e.printStackTrace();
-			}
+			readIs();
+			
+			//writeOs();
 		}
 
 		// end of clentConnect-----------------------------------
+	}
+
+	private void readIs() {
+		
+		byte[] message = new byte[Axis211A.IMAGE_BUFFER_SIZE];
+		
+		try {
+			is.read(message, 0, 1);
+			if(message[1] != 0) {
+				System.out.print("Client read: ");
+				System.out.print(message[1]);
+				System.out.println();
+			}
+		} catch (IOException e) {
+			System.out.println("Client: Failed to read bytes");
+			//e.printStackTrace();
+		}
+	}
+
+	private void writeOs() {
+		int message = 0;
+		for (int i = 0; i < 3; i++) {
+			message = (byte) i;
+
+			try {
+				os.write(message);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				sleep(10);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public void closeSocket() {

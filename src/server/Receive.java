@@ -11,25 +11,26 @@ import java.net.Socket;
  */
 
 public class Receive extends Thread{
-		
+
 	private Socket clientSocket;
 	private ServerMonitor serverMonitor;
 	private InputStream is;
-	private int receivedMode;
-	
+	private byte[] receivedMode;
+
 	public Receive(ServerMonitor serverMonitor) {
 		this.serverMonitor = serverMonitor;
+		receivedMode = new byte[1];
 	}
-	
+
 	public void run() {
 
-		
+
 		while(true) {
-			
+
 			// Wait for client to accept.
 			clientSocket = serverMonitor.waitForClientSocket();
-			System.out.println("Receive: clientSocket = " + serverMonitor.getClientSocket());
-			
+			//			System.out.println("Receive: clientSocket = " + serverMonitor.getClientSocket());
+
 			// Get input stream.
 			try {
 				is = clientSocket.getInputStream();
@@ -37,18 +38,23 @@ public class Receive extends Thread{
 				System.out.println("Receive: Failed to get input stream. Get new connection.");
 				continue;
 			} 
-			
+
 			// Read
-			try {
-				serverMonitor.setMode(is.read());
-			} catch (IOException e) {
-				System.out.println("Receive: Failed to get input stream. Get new connection.");
-				continue;
+			while(clientSocket.isConnected()){
+				try {
+					if(1 == is.read(receivedMode,0,1)) {
+						serverMonitor.setMode(receivedMode[0]);
+						System.out.println("Receive: read mode " + receivedMode[0]);	
+					}				
+				} catch (IOException e) {
+					System.out.println("Receive: Failed to get input stream. Get new connection.");
+					continue;
+				}
 			}
-						
+
 		}	
-		
+
 	}
-	
-	
+
+
 }

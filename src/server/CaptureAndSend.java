@@ -28,7 +28,7 @@ public class CaptureAndSend extends Thread{
 	private int port;
 	private int idleSendTime;										// Time to "wait" for sending when in idle mode. 
 
-	
+
 	/**
 	 * Constructor, creates a fake camera and gets port nbr.
 	 * @param port
@@ -36,9 +36,9 @@ public class CaptureAndSend extends Thread{
 	public CaptureAndSend(int port, ServerMonitor monitor) {
 		camera = new Axis211A();
 		this.port = port;
-		
+
 		idleSendTime = 5000;		// 5 sec.
-		
+
 		this.monitor = monitor;
 		motionDetector = new MotionDetector();
 	}
@@ -49,23 +49,20 @@ public class CaptureAndSend extends Thread{
 	 * detects motion and send to client.
 	 */
 	public void run(){
-		
 
 		while(true){
 
 			connectCamera();
 			connectClient();
-			
+
 			boolean detectHalf = true; // For performance, detect only half.
 			long t = System.currentTimeMillis();
-			
+
 			while(clientSocket.isConnected()) {
 				capture();
-				
+
 				if(detectHalf) {
 					if(motionDetector.detect()) {
-						System.out.println("Server: Motion detected!");
-						// TODO: handle motion i.e. send message to client.
 						if(monitor.getMode() == ServerMonitor.AUTO_MODE) {
 							monitor.setMode(ServerMonitor.MOVIE_MODE);
 						}
@@ -79,77 +76,41 @@ public class CaptureAndSend extends Thread{
 					if(System.currentTimeMillis() >= t) {
 						System.out.println("now: " + System.currentTimeMillis() + " t: " + t);
 						t += idleSendTime;
-						send();
+						monitor.send(os,jpeg,len);
 					}
 					break;
 				case ServerMonitor.MOVIE_MODE:
 					t = System.currentTimeMillis();
-					send();
+					monitor.send(os,jpeg,len);
 					break;
 				case ServerMonitor.AUTO_MODE:
 					if(System.currentTimeMillis() > t) {
 						t += idleSendTime;
-						send();
+						monitor.send(os,jpeg,len);
 					}
 					break;
 
 				default:
-						System.out.println("Mode does not exist!");
-						System.exit(1);
-						break;
+					System.out.println("CaptureAndSend: Mode does not exist!");
+					System.exit(1);
+					break;
 				}
 			} 
 		}
 	}
 
-
 	/**
-	 * For testing...
-	 */
-	private void printByte() {
-		for(int i = 0; i < 20; i++) {
-			System.out.print(jpeg[i] + " ");
-		}
-		System.out.println();
-	}
-
-	/**
-	 * Get jpeg from camera. Prints first bytes for test.
+	 * Get jpeg from camera and length of data.
 	 */
 	private void capture() {
 		len = camera.getJPEG(jpeg, 0);	
 	}
 
 	/**
-	 * Gets outputstream and then writes the jpeg byte array to it.
-	 */
-	private void send() {
-		// write        
-		try {
-		    // Create header
-			byte hi = (byte)(len / 255);
-			byte lo = (byte)(len % 255);
-				
-			// Send header
-			os.write(hi);
-			os.write(lo);
-		
-			byte zero = (byte) 0;
-			
-			os.write(zero);
-			os.write(jpeg,0,len);
-			os.flush();
-		} catch (IOException e) {
-			System.out.println("Server: Failed to write");
-			e.printStackTrace();
-		}        
-	}
-
-	/**
-	 * Tries to connect to camera. If not possible, exit system.
+	 * Tries to connect to camera. If not possible, sleeps and tries again.
 	 */
 	private void connectCamera() {
-			
+
 		while(!camera.connect()) {
 			System.out.println("Server: Camera failed to connect!");
 			try {
@@ -192,7 +153,7 @@ public class CaptureAndSend extends Thread{
 			e.printStackTrace();
 			System.out.println("Server: Failed to set TcpNoDelay");
 		}
-		
+
 		// Get outputstream
 		try {
 			os = clientSocket.getOutputStream();
@@ -200,7 +161,7 @@ public class CaptureAndSend extends Thread{
 			System.out.println("Server: /capture() Failed to get Outputstream");
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 }

@@ -15,7 +15,7 @@ public class CommandController extends Thread{
 	public void run() {
 		while(true) {
 
-			clientSocket = serverMonitor.getClientSocket();
+			clientSocket = serverMonitor.waitForClientSocket();
 			if(clientSocket != null) {
 				try {
 					os = clientSocket.getOutputStream();

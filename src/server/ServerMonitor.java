@@ -1,30 +1,22 @@
 package server;
 
 import se.lth.cs.fakecamera.Axis211A;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.*;
 
-/**
- * 
- * @author Viktor Andersson
- *
- * Monitor for images. (and requests?)
- */
-
 public class ServerMonitor {
-	byte [] jpeg = new byte[Axis211A.IMAGE_BUFFER_SIZE];
-	int mode;
-	Socket clientSocket = null;
-	boolean commandSent = true;
+	private byte [] jpeg = new byte[Axis211A.IMAGE_BUFFER_SIZE];
+	private int mode;
+	private Socket clientSocket = null;
+	private boolean commandSent = true;
 	
 	final static int IDLE_MODE = 0;
 	final static int MOVIE_MODE = 1;
 	final static int AUTO_MODE = 2;
 	
 	public ServerMonitor() {
-		mode = IDLE_MODE;
+		mode = IDLE_MODE;	
 	}
 	
 	public synchronized byte[] getImage() {
@@ -47,23 +39,60 @@ public class ServerMonitor {
 		notifyAll();
 	}
 	
+	/**
+	 * Gets outputstream and then writes the jpeg byte array to it.
+	 */
+	public synchronized void send(OutputStream os, byte[] jpeg, int len) {
+		// write        
+		try {
+			// Create header
+			byte hi = (byte)(len / 255);
+			byte lo = (byte)(len % 255);
+
+			// Send header
+			os.write(hi);
+			os.write(lo);
+
+			byte zero = (byte) 0;
+
+			os.write(zero);
+			os.write(jpeg,0,len);
+			os.flush();
+		} catch (IOException e) {
+			System.out.println("Server: Failed to write");
+			e.printStackTrace();
+		}        
+	}
+	
 	public synchronized void sendCommand(OutputStream os) {
 		while(!commandSent) {
-			byte one = (byte) 1;
-								
+
 			try {
+
+				// Create header
+				byte hi = (byte)(1 / 255);
+				byte lo = (byte)(1 % 255);
+
+				// Send header
+				os.write(hi);
+				os.write(lo);
+
+				byte one = (byte) 1;
+
+
 				os.write(one);
-				os.write(mode);
+				os.write((byte) mode);
 				os.flush();			
-				
+
 			} catch (IOException e) {
 				System.out.println("Server: Failed to write");
 				e.printStackTrace();
 			}
 			commandSent = true;
+			notifyAll();
 		}
 	}
-	
+
 	public synchronized Socket getClientSocket() {
 		return clientSocket;
 	}
