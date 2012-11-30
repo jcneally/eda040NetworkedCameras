@@ -8,6 +8,10 @@ import se.lth.cs.fakecamera.*;
 
 public class ClientMonitor {
 
+    final static int IDLE = 0;
+    final static int MOVIE = 1;
+    final static int AUTO = 2;
+
     private Socket camera1Sock, camera2Sock;	
 	private String serverCamera1;
 	private String serverCamera2;
@@ -16,15 +20,19 @@ public class ClientMonitor {
     private byte [] jpeg = new byte[Axis211A.IMAGE_BUFFER_SIZE];
     public JPEGBuffer bufferCamera1;
     public JPEGBuffer bufferCamera2;
+    private int mode = IDLE;   
+    public int alerted_camera = 0; // the camera that alerted the user to movement. 0 if none, or 1 and 2 respectively
+    GUI gui;
     
     
-    public ClientMonitor(String server1, String server2 ,int port1, int port2){
+    public ClientMonitor(String server1, String server2 ,int port1, int port2, GUI gui){
 	    serverCamera1 = server1;
 	    portCamera1 = port1;
 	    serverCamera2 = server2;
 	    portCamera2 = port2;
 	    bufferCamera1 = new JPEGBuffer();
 	    bufferCamera2 = new JPEGBuffer();
+	    this.gui = gui;
 	}
 
 
@@ -92,11 +100,26 @@ public class ClientMonitor {
 	    os2.write( (byte)command );
 	}
 	
+	// Sets the mode of the system
+	public synchronized void set_mode(int n){
+	    mode = n;
+	    // reswitched to auto mode, so reset the alerted camera so it can be set again.
+	    if(mode == AUTO){
+	        alerted_camera = 0;
+	    }
+	}
+	
 		// camera is 1 or 2
 	private synchronized void handle_command(InputStream is, int camera) throws IOException{
 	    int command = (is.read() & 0xFF);
 	    if(command == -1) throw new IOException("Expected valid command but was not valid");
 	    System.out.println("The command sent from camera " + camera + " was " + command);
+	    if(command == 1 && mode == AUTO){
+	      gui.selectMovement(MOVIE);
+	      mode = MOVIE;
+	      alerted_camera = camera;
+	      gui.alert(alerted_camera);
+	    }
 	}
 	
 	// Params:
