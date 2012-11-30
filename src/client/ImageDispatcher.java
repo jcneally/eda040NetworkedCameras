@@ -52,8 +52,8 @@ public class ImageDispatcher extends Thread{
 			int delayDifference = Math.abs(delayCamera1-delayCamera2);
 			
 			if((System.currentTimeMillis()-updateTime)>=delayDifference){			
-				gui.updateCamera1(bufferCamera1.getJPEG());
-				gui.updateCamera2(bufferCamera2.getJPEG());	
+				gui.updateCamera1(monitor.bufferCamera1.getJPEG());
+				gui.updateCamera2(monitor.bufferCamera2.getJPEG());	
 				updateTime = System.currentTimeMillis();
 			}
 			break;
@@ -82,13 +82,13 @@ public class ImageDispatcher extends Thread{
 	
 	private void refreshData(){
 		if((System.currentTimeMillis()-startTime)>=1000){
-			gui.setFPS(bufferCamera1.getNumOfImg(), CAMERA1);
-			gui.setFPS(bufferCamera2.getNumOfImg(), CAMERA2);
+			gui.setFPS(monitor.bufferCamera1.getNumOfImg(), CAMERA1);
+			gui.setFPS(monitor.bufferCamera2.getNumOfImg(), CAMERA2);
 			startTime = System.currentTimeMillis();
 		}
 		
-		delayCamera1 = bufferCamera1.getDelay();
-		delayCamera2 = bufferCamera2.getDelay();
+		delayCamera1 = monitor.bufferCamera1.getDelay();
+		delayCamera2 = monitor.bufferCamera2.getDelay();
 		gui.setDelay(delayCamera1, CAMERA1);
 		gui.setDelay(delayCamera2, CAMERA2);
 	}
