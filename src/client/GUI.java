@@ -93,6 +93,10 @@ class GUI extends JFrame {
     JLabel delay1, fps1, movement1;
     JLabel delay2, fps2, movement2;
     
+    // alert labels
+    JLabel alert1;
+    JLabel alert2;
+    
     // Radio buttons at the bottom
     JRadioButton movie, idle, auto, sync, async;
     
@@ -100,10 +104,9 @@ class GUI extends JFrame {
     boolean camera1connected = false;
     boolean camera2connected = false;
     
-    public GUI(ClientMonitor mon) {
+    public GUI() {
         super();
         
-        monitor = mon;
         // Default camera image at the start
         ImageIcon icon = new ImageIcon("../camera.jpeg");
         
@@ -130,6 +133,9 @@ class GUI extends JFrame {
         idle = new JRadioButton("Idle");
         auto = new JRadioButton("Auto");
         
+        alert1 = new JLabel();
+        alert2 = new JLabel();
+        
         sync = new JRadioButton("Synchronus");
         async = new JRadioButton("Asynchronus");
         
@@ -139,9 +145,9 @@ class GUI extends JFrame {
         connectCamera2.addActionListener(new ConnectionButtonHandler(this, 2));
         disconnectCamera2.addActionListener(new ConnectionButtonHandler(this, 2));
         
-        movie.addActionListener(new MovementButtonHandler(this, 1));
-        idle.addActionListener(new MovementButtonHandler(this, 2));
-        auto.addActionListener(new MovementButtonHandler(this, 3));
+        movie.addActionListener(new MovementButtonHandler(this, ClientMonitor.MOVIE));
+        idle.addActionListener(new MovementButtonHandler(this, ClientMonitor.IDLE));
+        auto.addActionListener(new MovementButtonHandler(this, ClientMonitor.AUTO));
         
         sync.addActionListener(new SynchronizeButtonHandler(this, 1));
         async.addActionListener(new SynchronizeButtonHandler(this, 2));
@@ -193,6 +199,10 @@ class GUI extends JFrame {
 		left.add(movement1, c);
 		right.add(movement2, c);
 		
+		c.gridy = 5;
+		
+		left.add(alert1, c);
+		right.add(alert2, c);
 		
 		// just reusing this, new object for default vals
 		c = new GridBagConstraints();
@@ -200,11 +210,13 @@ class GUI extends JFrame {
 		// First row of bottom; movie and sync radio buttons
 		c.gridx = 0;
 		c.gridy = 0;
+		sync.setSelected(true);
 		bottom_left.add(movie, c);
 		bottom_right.add(sync, c);
 		
 		// Second row, idle and async radio buttons
 		c.gridy = 1;
+		idle.setSelected(true);
 		bottom_left.add(idle, c);
 		bottom_right.add(async, c);
 		
@@ -284,9 +296,30 @@ class GUI extends JFrame {
     	j.setText("FPS: " + fps);
 	}
 	
-	public void setMovement(String movement, int camera){
+	public void setMovement(int movement, int camera){
     	JLabel j = (camera == 1) ? movement1 : movement2;
-    	j.setText("Movement: " + movement);
+    	String text = "";
+    	// Set a color based on movement
+    	switch(movement){
+    	
+    	case ClientMonitor.MOVIE:
+    	j.setForeground(Color.green);
+    	text += "Movie";
+    	break;
+    	
+    	case ClientMonitor.IDLE:
+    	j.setForeground(Color.red);
+    	text += "Idle";
+    	break;
+    	
+    	case ClientMonitor.AUTO:
+    	j.setForeground(Color.blue);
+    	text += "Auto";
+    	break;
+    	
+    	}
+    	
+        j.setText("Movement: " + text);
 	}
 	
 	// sets the movement mode based on a number 1 - 2 - 3 (sequentially vertical)
@@ -298,22 +331,29 @@ class GUI extends JFrame {
 		 try{
 		 
 		 switch(num){
-		 	case 1:
-		 		movie.setSelected(true);
-		 		monitor.send_command(1);
+		 	case ClientMonitor.MOVIE:
+		 	    movie.setSelected(true);
+		 		monitor.set_mode(ClientMonitor.MOVIE);
+		 		monitor.send_command(ClientMonitor.MOVIE);
 		 		break;
-		 	case 2:
+		 	case ClientMonitor.IDLE:
 		 		idle.setSelected(true);
-		 		monitor.send_command(2);
+		 		monitor.set_mode(ClientMonitor.IDLE);
+		 		monitor.send_command(ClientMonitor.IDLE);
 		 		break;
-		 	case 3:
+		 	case ClientMonitor.AUTO:
 		 		auto.setSelected(true);
-		 		monitor.send_command(3);
+		 		monitor.set_mode(ClientMonitor.AUTO);
+		 		monitor.send_command(ClientMonitor.AUTO);
 		 		break;
 		 }
 		 
-		 } catch(java.io.IOException e)
-		 { System.out.println("IO Exception"); }
+		 } catch(java.io.IOException e){
+		    System.out.println("generic error message");
+		 }
+		 setMovement(num, 1);
+		 setMovement(num, 2);
+		 alert(0); // reset alert
 	}
 	
 	// sets the Sync mode based on a number 1 - 2 (sequentially vertical)
@@ -342,6 +382,26 @@ class GUI extends JFrame {
         Image theImage = getToolkit().createImage(data);
         getToolkit().prepareImage(theImage,-1,-1,null);     
         camera2.setIcon(new ImageIcon(theImage));
+    }
+    
+    // Sort of hack to deal with GUI and Monitor's dependencies on eachother
+    public void setMonitor(ClientMonitor mon){
+        monitor = mon;
+    }
+    
+    // set the camera alert for a camera. 0 for none, 1 or 2 for camera
+    public void alert(int cam){
+        alert1.setText("");
+        alert2.setText("");
+        
+        if(cam == 1){
+            alert1.setText("ALERT!");
+            alert1.setForeground(Color.red);
+        } else if(cam == 2){
+            alert2.setText("ALERT!");
+            alert2.setForeground(Color.red);
+        }
+        
     }
 	
 }
