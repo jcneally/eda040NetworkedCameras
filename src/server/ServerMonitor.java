@@ -7,6 +7,7 @@ import java.net.*;
 public class ServerMonitor {
 	private int mode;
 	private Socket clientSocket = null;
+	boolean connected = false;
 	
 	final static int IDLE_MODE = 0;
 	final static int MOVIE_MODE = 1;
@@ -28,7 +29,7 @@ public class ServerMonitor {
 	/**
 	 * Gets outputstream and then writes the jpeg byte array to it.
 	 */
-	public synchronized boolean send(OutputStream os, byte[] jpeg, int len) {
+	public synchronized boolean send(OutputStream os, byte[] jpeg, int len) {	
 		// write        
 		try {
 			// Create header
@@ -46,8 +47,10 @@ public class ServerMonitor {
 			os.flush();
 			return true;
 		} catch (IOException e) {
-			System.out.println("Server: Failed to write");
-//			e.printStackTrace();
+		    // This means they stopped the connection.
+		    connected = false;
+			//System.out.println("Server: Failed to write");
+            //e.printStackTrace();
 			return false;
 		}        
 	}

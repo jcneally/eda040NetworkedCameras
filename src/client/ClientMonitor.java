@@ -24,6 +24,9 @@ public class ClientMonitor {
     public int alerted_camera = 0; // the camera that alerted the user to movement. 0 if none, or 1 and 2 respectively
     GUI gui;
     
+    boolean camera1Connected = false;
+    boolean camera2Connected = false;
+    
     
     public ClientMonitor(String server1, String server2 ,int port1, int port2, GUI gui){
 	    serverCamera1 = server1;
@@ -36,12 +39,26 @@ public class ClientMonitor {
 	}
 
 
-    public synchronized boolean connect(){
-     System.out.println("Trying to connect to " + serverCamera1 + " at port " + portCamera1);
+    public synchronized boolean connect(int cam){
+     boolean cam1 = (cam == 1);
+     boolean alreadyConnected = (cam1) ? camera1Connected : camera2Connected;
+     if(!alreadyConnected){
+     
+     System.out.println("Trying to connect camera " + cam + " to " + serverCamera1 + " at port " + portCamera1);
      try{
-       camera1Sock = new Socket(serverCamera1, portCamera1);
-       camera2Sock = new Socket(serverCamera2, portCamera2);
-      return true;
+        Socket sock = (cam1) ? camera1Sock : camera2Sock;
+        String server = (cam1) ? serverCamera1 : serverCamera2;
+        int port = (cam1) ? portCamera1 : portCamera2;
+        sock = new Socket(server, port);
+        if (cam1){
+          camera1Connected = true;
+          camera1Sock = sock;
+        }
+        else{
+          camera2Connected = true;
+          camera2Sock = sock;
+        }
+        return true;
      } catch (java.net.UnknownHostException e){
       System.out.println("Could not connect, unknown host");
       return false;
@@ -49,12 +66,49 @@ public class ClientMonitor {
        System.out.println("IO Exception. Could not connect");
        return false;
      }
+     }
+     
+     return false;
+    }
+    
+    public synchronized boolean disconnect(int cam){
+     boolean cam1 = (cam == 1);
+     boolean connected = (cam1) ? camera1Connected : camera2Connected;
+     if(connected){
+      System.out.println("Trying to disconnect camera " + cam);
+      try{
+        Socket sock = (cam1) ? camera1Sock : camera2Sock;
+        if (cam1)
+          camera1Connected = false;
+        else
+          camera2Connected = false;
+        sock.close();
+        return true;
+		} catch (java.net.UnknownHostException e) {
+			// Occurs if the socket cannot find the host
+			e.printStackTrace();
+			return false;
+		} catch (java.io.IOException e) {
+			// Occurs if there is an error trying to connect to the host,
+			// or there is an error during the call to the write method.
+			//
+			// Example: the connection is closed on the server side, but
+			// the client is still trying to write data.
+			e.printStackTrace();
+			return false;
+		}
+	  }
+	  return false;
     }
     
 	public synchronized void receiveData(int cam){
+	    boolean cameraConnected = (cam == 1) ? camera1Connected : camera2Connected;
+	    if(cameraConnected){
+	    
 		try {
-		
+		    //System.out.println("see if it's here");
             InputStream is = (cam == 1) ? camera1Sock.getInputStream() : camera2Sock.getInputStream();
+            //System.out.println("does this print?");
             JPEGBuffer buffer = (cam == 1) ? bufferCamera1 : bufferCamera2;
     
             // Read header - read is blocking
@@ -86,6 +140,8 @@ public class ClientMonitor {
             System.out.println(e.getMessage());
 	    return;
         }
+        
+        }
 	}
 	
 	// Commands are:
@@ -94,10 +150,15 @@ public class ClientMonitor {
 	// 3 - Camera goes to AUTO, should tell the client about movement
 	// OBS:  Commands are ALWAYS sent to both servers
 	public synchronized void send_command(int command) throws IOException{
-	    OutputStream os = camera1Sock.getOutputStream();
-	    OutputStream os2 = camera2Sock.getOutputStream();
-	    os.write( (byte)command );
-	    os2.write( (byte)command );
+	    if(camera1Connected){
+	      OutputStream os = camera1Sock.getOutputStream();
+	      os.write( (byte)command );
+	    }
+	    if(camera2Connected){
+	      OutputStream os2 = camera2Sock.getOutputStream();
+	      os2.write( (byte)command );
+	    }
+	    System.out.println("Sent command " + command);
 	}
 	
 	// Sets the mode of the system
@@ -137,8 +198,8 @@ public class ClientMonitor {
 	    	if (n == -1) throw new IOException("End of stream");
 	    		read += n;
 	    }
+	    
         buffer.putJPEG(jpeg);
 	}
-
 
 }

@@ -52,16 +52,16 @@ public class ImageDispatcher extends Thread{
 			int delayDifference = Math.abs(delayCamera1-delayCamera2);
 			
 			if((System.currentTimeMillis()-updateTime)>=delayDifference){			
-				gui.updateCamera1(monitor.bufferCamera1.getJPEG());
-				gui.updateCamera2(monitor.bufferCamera2.getJPEG());	
+				if(monitor.camera1Connected) gui.updateCamera1(monitor.bufferCamera1.getJPEG());
+				if(monitor.camera2Connected) gui.updateCamera2(monitor.bufferCamera2.getJPEG());	
 				updateTime = System.currentTimeMillis();
 			}
 			break;
 		
 		case ASYNC:
 			//return the current image
-			gui.updateCamera1(monitor.bufferCamera1.getJPEG());
-			gui.updateCamera2(monitor.bufferCamera2.getJPEG());			
+			if(monitor.camera1Connected) gui.updateCamera1(monitor.bufferCamera1.getJPEG());
+			if(monitor.camera2Connected) gui.updateCamera2(monitor.bufferCamera2.getJPEG());			
 			break;
 		}
 	}
@@ -82,22 +82,22 @@ public class ImageDispatcher extends Thread{
 	
 	private void refreshData(){
 		if((System.currentTimeMillis()-startTime)>=1000){
-			gui.setFPS(monitor.bufferCamera1.getNumOfImg(), CAMERA1);
-			gui.setFPS(monitor.bufferCamera2.getNumOfImg(), CAMERA2);
+			if(monitor.camera1Connected) gui.setFPS(monitor.bufferCamera1.getNumOfImg(), CAMERA1);
+			if(monitor.camera2Connected) gui.setFPS(monitor.bufferCamera2.getNumOfImg(), CAMERA2);
 			startTime = System.currentTimeMillis();
 		}
 		
-		delayCamera1 = monitor.bufferCamera1.getDelay();
-		delayCamera2 = monitor.bufferCamera2.getDelay();
-		gui.setDelay(delayCamera1, CAMERA1);
-		gui.setDelay(delayCamera2, CAMERA2);
+		if(monitor.camera1Connected) delayCamera1 = monitor.bufferCamera1.getDelay();
+		if(monitor.camera2Connected) delayCamera2 = monitor.bufferCamera2.getDelay();
+		if(monitor.camera1Connected) gui.setDelay(delayCamera1, CAMERA1);
+		if(monitor.camera2Connected) gui.setDelay(delayCamera2, CAMERA2);
 	}
 	
 	public void run(){
 		while(true){
 		refreshData();
 		refreshImage(ASYNC);
-		System.out.println("Delay 1: "+delayCamera1+" Delay 2: "+delayCamera2);
+		//System.out.println("Delay 1: "+delayCamera1+" Delay 2: "+delayCamera2);
 		}
 	}
 }
