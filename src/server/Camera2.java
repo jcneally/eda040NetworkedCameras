@@ -9,7 +9,7 @@ public class Camera2 {
 		mon.setMode(1); //movie
 		System.out.println("serverMonitor created");
 		
-		CaptureAndSend captureAndSend = new CaptureAndSend(6078, mon);
+		CaptureAndSend captureAndSend = new CaptureAndSend(6078, mon, "argus-1", 7777);
 		Receive receive = new Receive(mon);
 		
 		captureAndSend.start();
