@@ -170,6 +170,10 @@ public class ClientMonitor {
 	    }
 	}
 	
+	public synchronized int get_mode(){
+		return mode;
+	}
+	
 		// camera is 1 or 2
 	private synchronized void handle_command(InputStream is, int camera) throws IOException{
 	    int command = (is.read() & 0xFF);
