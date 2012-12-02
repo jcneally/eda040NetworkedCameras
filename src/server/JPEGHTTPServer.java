@@ -38,9 +38,9 @@ public class JPEGHTTPServer {
     /**
      * @param   port   The TCP port the server should listen to
      */
-    public JPEGHTTPServer(int port) {
+    public JPEGHTTPServer(int port, String server, int port2) {
 	myPort   = port;
-	myCamera = new Axis211A();
+	myCamera = new Axis211A(server, port2);
     }
 
     // --------------------------------------------------------- PUBLIC METHODS
