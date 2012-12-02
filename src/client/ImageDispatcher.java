@@ -37,7 +37,6 @@ public class ImageDispatcher extends Thread{
 	}
 	
 	private void refreshImage(int SynchronizationMode){
-		
 		if(SynchronizationMode==AUTO){
 			mode = controlSynchronization(mode);
 			monitor.syncMode = mode;
@@ -49,32 +48,17 @@ public class ImageDispatcher extends Thread{
 
 		case SYNC:
 			//return the most delayed image and the other with an added delay equal to the difference between both images delays
-			int delayDifference = (delayCamera1-delayCamera2);
+			int delayDifference = Math.abs(delayCamera1-delayCamera2);
 			
-			if(delayDifference>0){			
-				if(monitor.camera2Connected) gui.updateCamera2(monitor.bufferCamera2.getJPEG());
-				try {
-					Thread.sleep(delayDifference);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}	
+			//if((System.currentTimeMillis()-updateTime)>=delayDifference){			
 				if(monitor.camera1Connected) gui.updateCamera1(monitor.bufferCamera1.getJPEG());
-			}else{
-				if(monitor.camera1Connected)  gui.updateCamera1(monitor.bufferCamera1.getJPEG());
-				try {
-					Thread.sleep(-delayDifference);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}	
-				if(monitor.camera2Connected) gui.updateCamera2(monitor.bufferCamera2.getJPEG());
-			}
+				if(monitor.camera2Connected) gui.updateCamera2(monitor.bufferCamera2.getJPEG());	
+				updateTime = System.currentTimeMillis();
+			//}
 			break;
 		
 		case ASYNC:
 			//return the current image
-			if(monitor.camera1Connected) gui.updateCamera1(monitor.bufferCamera1.getJPEG());
-			if(monitor.camera2Connected) gui.updateCamera2(monitor.bufferCamera2.getJPEG());	
-			refreshData();
 			if(monitor.camera1Connected) gui.updateCamera1(monitor.bufferCamera1.getJPEG());
 			if(monitor.camera2Connected) gui.updateCamera2(monitor.bufferCamera2.getJPEG());			
 			break;
@@ -95,16 +79,6 @@ public class ImageDispatcher extends Thread{
 	}
 	
 	
-	private void refreshFPS(){
-		long time = (System.currentTimeMillis()-startTime);
-		if(time>=1000){
-			time = time/1000;
-			if(monitor.camera1Connected) gui.setFPS(monitor.bufferCamera1.getNumOfImg()/time, CAMERA1);
-			if(monitor.camera2Connected) gui.setFPS(monitor.bufferCamera2.getNumOfImg()/time, CAMERA2);
-			startTime = System.currentTimeMillis();
-		}
-	}
-	
 	private void refreshData(){
 		if((System.currentTimeMillis()-startTime)>=1000){
 			if(monitor.camera1Connected) gui.setFPS(monitor.bufferCamera1.getNumOfImg(), CAMERA1);
@@ -120,7 +94,7 @@ public class ImageDispatcher extends Thread{
 	
 	public void run(){
 		while(true){
-		refreshFPS();
+		refreshData();
 		refreshImage(monitor.syncMode);
 		//System.out.println("Delay 1: "+delayCamera1+" Delay 2: "+delayCamera2);
 		}
