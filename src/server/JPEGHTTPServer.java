@@ -12,7 +12,7 @@ package server;
 import java.net.*;                  // Provides ServerSocket, Socket
 import java.io.*;                   // Provides InputStream, OutputStream
 
-import se.lth.cs.cameraproxy.*;      // Provides Axis211A
+import se.lth.cs.cameraproxy.Axis211A;      // Provides Axis211A
 
 /**
  * Itsy bitsy teeny weeny web server. Always returns an image, regardless
@@ -23,10 +23,11 @@ public class JPEGHTTPServer {
     // ----------------------------------------------------------- MAIN PROGRAM
 
     public static void main(String[]args) {
-	JPEGHTTPServer theServer = new JPEGHTTPServer(6077, "argus-1", 7878);
-	JPEGHTTPServer theServer2 = new JPEGHTTPServer(6078, "argus-2", 7879);
+	JPEGHTTPServer theServer = new JPEGHTTPServer(3000, "argus-4", 7778);
+    JPEGHTTPServer theServer2 = new JPEGHTTPServer(6001, "argus-2", 7778);
 	try {
 	    theServer.handleRequests();
+		//theServer2.handleRequests();
 	} catch(IOException e) {
 	    System.out.println("Error!");
 	    System.exit(1);
@@ -67,7 +68,11 @@ public class JPEGHTTPServer {
 	    try {
 		// The 'accept' method waits for a client to connect, then
 		// returns a socket connected to that client.
+
+System.out.println("got here");
 		Socket clientSocket = serverSocket.accept();
+
+System.out.println("got here 2");
 	
 		// The socket is bi-directional. It has an input stream to read
 		// from and an output stream to write to. The InputStream can
@@ -77,6 +82,7 @@ public class JPEGHTTPServer {
 		InputStream  is = clientSocket.getInputStream();
 		OutputStream os = clientSocket.getOutputStream();
 	
+
 		// Read the request
 		String request = getLine(is);
 
