@@ -2,8 +2,7 @@ package server;
 
 import java.net.*;
 import java.io.*;
-import se.lth.cs.fakecamera.Axis211A;
-import se.lth.cs.fakecamera.MotionDetector;
+import se.lth.cs.cameraproxy.*;
 
 /**
  * 
@@ -33,14 +32,14 @@ public class CaptureAndSend extends Thread{
 	 * Constructor, creates a fake camera and gets port nbr.
 	 * @param port
 	 */
-	public CaptureAndSend(int port, ServerMonitor monitor) {
-		camera = new Axis211A();
+	public CaptureAndSend(int port, ServerMonitor monitor, String server, int port2) {
+		camera = new Axis211A(server, port2);
 		this.port = port;
 
 		idleSendTime = 5000;		// 5 sec.
 
 		this.monitor = monitor;
-		motionDetector = new MotionDetector();
+		motionDetector = new MotionDetector(server, port2);
 	}
 
 	/**
