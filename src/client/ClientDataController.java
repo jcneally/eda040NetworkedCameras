@@ -22,13 +22,9 @@ public class ClientDataController extends Thread {
 	}
 
 	public void run(){
-	if(monitor.connect())
-          System.out.println("Successfully connected");
-	else
-          System.out.println("There was an error connecting.");
     while(true){
-          monitor.receiveData(1);
-          monitor.receiveData(2);
+            monitor.receiveData(1);
+            monitor.receiveData(2);
         }
 	}
 

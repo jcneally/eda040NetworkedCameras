@@ -79,6 +79,8 @@ class GUI extends JFrame {
 
     ClientMonitor monitor;
 
+    boolean connectingOrDisconnecting = false;
+
 	// Camera images
     JLabel camera1;
     JLabel camera2;
@@ -263,18 +265,30 @@ class GUI extends JFrame {
         updateButtons();
     }
     
-    /** Toggles connection. 1 for camera 1 and 2 for camera 2.
-     	NOTE: We likely want to gray out ALL buttons during the connection and disconnection process. Implement this when we get there.
-    	
-    	Right now this is only a GUI 
+    /**
+    Toggles connection. 1 for camera 1 and 2 for camera 2.
     */
     public void toggleConnection(int camera){
-    	if(camera == 1)
-    		camera1connected = !camera1connected;
-    	else if (camera == 2)
-    		camera2connected = !camera2connected;
-    		
-        updateButtons();
+        if(!connectingOrDisconnecting){
+          connectingOrDisconnecting = true;
+    	  if(camera == 1){
+    	    if(monitor.camera1Connected)
+    	      monitor.disconnect(1);
+            else
+              monitor.connect(1);
+    	  	camera1connected = !camera1connected;
+    	  }
+    	  else if (camera == 2){
+    	    if(monitor.camera2Connected)
+    	      monitor.disconnect(2);
+            else
+              monitor.connect(2);
+    	  	camera2connected = !camera2connected;
+    	  	
+    	  }
+          updateButtons();
+          connectingOrDisconnecting = false;
+        }
     }
     
     // Based on whether the cameras are connected or not, updates the buttons to be grayed out

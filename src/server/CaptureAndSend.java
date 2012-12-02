@@ -58,7 +58,7 @@ public class CaptureAndSend extends Thread{
 			boolean detectHalf = true; // For performance, detect only half.
 			long t = System.currentTimeMillis();
 
-			while(clientSocket.isConnected()) {
+			while(monitor.connected) {
 				capture();
 
 				if(detectHalf) {
@@ -164,7 +164,7 @@ public class CaptureAndSend extends Thread{
 			System.out.println("Server: /capture() Failed to get Outputstream");
 			e.printStackTrace();
 		}
-
+        monitor.connected = true;
 	}
 
 }

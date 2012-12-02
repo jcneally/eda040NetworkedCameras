@@ -52,6 +52,7 @@ public class ImageDispatcher extends Thread{
 			int delayDifference = (delayCamera1-delayCamera2);
 			System.out.println(delayDifference);
 			
+<<<<<<< HEAD
 			if(delayDifference>0){			
 				gui.updateCamera2(monitor.bufferCamera2.getJPEG());
 				try {
@@ -68,6 +69,12 @@ public class ImageDispatcher extends Thread{
 					e.printStackTrace();
 				}	
 				gui.updateCamera2(monitor.bufferCamera2.getJPEG());
+=======
+			if((System.currentTimeMillis()-updateTime)>=delayDifference){			
+				if(monitor.camera1Connected) gui.updateCamera1(monitor.bufferCamera1.getJPEG());
+				if(monitor.camera2Connected) gui.updateCamera2(monitor.bufferCamera2.getJPEG());	
+				updateTime = System.currentTimeMillis();
+>>>>>>> 911e458c95580ee062cb15cddcc2132ac53809c7
 			}
 				//updateTime = System.currentTimeMillis();
 				refreshData();
@@ -76,9 +83,14 @@ public class ImageDispatcher extends Thread{
 		
 		case ASYNC:
 			//return the current image
+<<<<<<< HEAD
 			gui.updateCamera1(monitor.bufferCamera1.getJPEG());
 			gui.updateCamera2(monitor.bufferCamera2.getJPEG());	
 			refreshData();
+=======
+			if(monitor.camera1Connected) gui.updateCamera1(monitor.bufferCamera1.getJPEG());
+			if(monitor.camera2Connected) gui.updateCamera2(monitor.bufferCamera2.getJPEG());			
+>>>>>>> 911e458c95580ee062cb15cddcc2132ac53809c7
 			break;
 		}
 	}
@@ -97,6 +109,7 @@ public class ImageDispatcher extends Thread{
 	}
 	
 	
+<<<<<<< HEAD
 	private void refreshFPS(){
 		long time = (System.currentTimeMillis()-startTime);
 		if(time>=1000){
@@ -112,12 +125,30 @@ public class ImageDispatcher extends Thread{
 		delayCamera2 = monitor.bufferCamera2.getDelay();
 		gui.setDelay(delayCamera1, CAMERA1);
 		gui.setDelay(delayCamera2, CAMERA2);
+=======
+	private void refreshData(){
+		if((System.currentTimeMillis()-startTime)>=1000){
+			if(monitor.camera1Connected) gui.setFPS(monitor.bufferCamera1.getNumOfImg(), CAMERA1);
+			if(monitor.camera2Connected) gui.setFPS(monitor.bufferCamera2.getNumOfImg(), CAMERA2);
+			startTime = System.currentTimeMillis();
+		}
+		
+		if(monitor.camera1Connected) delayCamera1 = monitor.bufferCamera1.getDelay();
+		if(monitor.camera2Connected) delayCamera2 = monitor.bufferCamera2.getDelay();
+		if(monitor.camera1Connected) gui.setDelay(delayCamera1, CAMERA1);
+		if(monitor.camera2Connected) gui.setDelay(delayCamera2, CAMERA2);
+>>>>>>> 911e458c95580ee062cb15cddcc2132ac53809c7
 	}
 	
 	public void run(){
 		while(true){
+<<<<<<< HEAD
 		refreshFPS();
 		refreshImage(SYNC);
+=======
+		refreshData();
+		refreshImage(ASYNC);
+>>>>>>> 911e458c95580ee062cb15cddcc2132ac53809c7
 		//System.out.println("Delay 1: "+delayCamera1+" Delay 2: "+delayCamera2);
 		}
 	}
