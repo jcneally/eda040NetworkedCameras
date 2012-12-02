@@ -23,6 +23,7 @@ public class ClientMonitor {
     private int mode = IDLE;   
     public int alerted_camera = 0; // the camera that alerted the user to movement. 0 if none, or 1 and 2 respectively
     GUI gui;
+    public int syncMode = ImageDispatcher.SYNC;
     
     boolean camera1Connected = false;
     boolean camera2Connected = false;
@@ -168,10 +169,6 @@ public class ClientMonitor {
 	    if(mode == AUTO){
 	        alerted_camera = 0;
 	    }
-	}
-	
-	public synchronized int get_mode(){
-		return mode;
 	}
 	
 		// camera is 1 or 2
