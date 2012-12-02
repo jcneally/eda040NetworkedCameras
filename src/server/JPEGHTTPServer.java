@@ -12,7 +12,7 @@ package server;
 import java.net.*;                  // Provides ServerSocket, Socket
 import java.io.*;                   // Provides InputStream, OutputStream
 
-import se.lth.cs.fakecamera.*;      // Provides Axis211A
+import se.lth.cs.cameraproxy.*;      // Provides Axis211A
 
 /**
  * Itsy bitsy teeny weeny web server. Always returns an image, regardless
@@ -23,7 +23,8 @@ public class JPEGHTTPServer {
     // ----------------------------------------------------------- MAIN PROGRAM
 
     public static void main(String[]args) {
-	JPEGHTTPServer theServer = new JPEGHTTPServer(6077);
+	JPEGHTTPServer theServer = new JPEGHTTPServer(6077, "argus-1", 7878);
+	JPEGHTTPServer theServer2 = new JPEGHTTPServer(6078, "argus-2", 7879);
 	try {
 	    theServer.handleRequests();
 	} catch(IOException e) {
